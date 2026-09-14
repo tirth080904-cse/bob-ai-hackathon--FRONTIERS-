@@ -71,9 +71,15 @@ submission:
 team:
   name: "Frontiers"
   track: "AI"
-  lead: "Tirth Makwana <tirth080904@gmail.com>"
+  lead:
+    name: "Tirth Makwana"
+    email: "tirth080904@gmail.com"
   members:
-    - "Tirth Makwana <tirth080904@gmail.com>"
-    - "Kunj Patel <kunj275patel@gmail.com>"
-    - "Mihir Rana <ranamihir2008@gmail.com>"
-    - "Jaini Khandhar <jaini.khandhar@gmail.com>"
+    - name: "Tirth Makwana"
+      email: "tirth080904@gmail.com"
+    - name: "Kunj Patel"
+      email: "kunj275patel@gmail.com"
+    - name: "Mihir Rana"
+      email: "ranamihir2008@gmail.com"
+    - name: "Jaini Khandhar"
+      email: "jaini.khandhar@gmail.com"
