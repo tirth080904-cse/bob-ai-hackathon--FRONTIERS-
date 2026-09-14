@@ -1,25 +1,22 @@
-# Setup Guide
-
-<<<<<<< HEAD
-## Prerequisites
+﻿## Prerequisites
 
 | Requirement | Dashboard (browser) | Python CLI |
 |---|---|---|
-| Modern browser (Chrome, Firefox, Edge, Safari) | ✅ Required | — |
-| Internet connection | ✅ Required (CDN assets) | ❌ Not needed |
-| Python 3.8 or later | — | ✅ Required |
-| `pip install` / third-party packages | ❌ None needed | ❌ None needed |
-| Node.js / npm / build tool | ❌ Not needed | ❌ Not needed |
-| Web server / localhost | ❌ Not needed | ❌ Not needed |
-| API key of any kind | ❌ None required | ❌ None required |
+| Modern browser (Chrome, Firefox, Edge, Safari) | âœ… Required | â€” |
+| Internet connection | âœ… Required (CDN assets) | âŒ Not needed |
+| Python 3.8 or later | â€” | âœ… Required |
+| `pip install` / third-party packages | âŒ None needed | âŒ None needed |
+| Node.js / npm / build tool | âŒ Not needed | âŒ Not needed |
+| Web server / localhost | âŒ Not needed | âŒ Not needed |
+| API key of any kind | âŒ None required | âŒ None required |
 
-The dashboard opens directly as a local file — there is no build step, no server
+The dashboard opens directly as a local file â€” there is no build step, no server
 to start, and no environment variables to set. The Python CLI uses only the
 Python standard library.
 
 ---
 
-## Option A — Run the Dashboard in a Browser
+## Option A â€” Run the Dashboard in a Browser
 
 This is the primary way to use R.E.A.C.T.
 
@@ -57,14 +54,14 @@ src/dashboard.html
 | `route.analyst` | `route123` | Route Analyst |
 | `ops.director` | `ops2024` | Operations Director |
 
-Click **⚓ Board the Bridge** (or click one of the "Use" quick-access buttons)
+Click **âš“ Board the Bridge** (or click one of the "Use" quick-access buttons)
 to enter the Operations Dashboard.
 
 > **That's it.** No install, no server, no keys.
 
 ---
 
-## Option B — Run the Python CLI
+## Option B â€” Run the Python CLI
 
 The Python CLI provides the same four analytical modules as a terminal menu.
 
@@ -102,11 +99,11 @@ python main.py
 
   Select a module to run:
 
-    [1]  Disruption Monitor      — Detect affected shipments
-    [2]  Route Optimizer         — Alternative route recommendations
-    [3]  Fleet Optimizer         — Idle asset detection
-    [4]  Cold Chain Monitor      — Temperature excursion alerts
-    [5]  Operations Dashboard    — Compact summary (all modules)
+    [1]  Disruption Monitor      â€” Detect affected shipments
+    [2]  Route Optimizer         â€” Alternative route recommendations
+    [3]  Fleet Optimizer         â€” Idle asset detection
+    [4]  Cold Chain Monitor      â€” Temperature excursion alerts
+    [5]  Operations Dashboard    â€” Compact summary (all modules)
     [0]  Exit
 ```
 
@@ -126,14 +123,14 @@ DISRUPTION_REASON   = "Port workers' strike causing vessel backlog"  # and this
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| **Map is blank / grey** | No internet connection — Leaflet tiles are loaded from OpenStreetMap CDN at runtime | Connect to the internet and reload the page. There is no offline tile cache. |
-| **Map loads but fonts look wrong** | No internet connection — Inter and Nunito are loaded from Google Fonts CDN | Connect to the internet. The UI is fully functional with system fallback fonts; only the visual appearance differs. |
+| **Map is blank / grey** | No internet connection â€” Leaflet tiles are loaded from OpenStreetMap CDN at runtime | Connect to the internet and reload the page. There is no offline tile cache. |
+| **Map loads but fonts look wrong** | No internet connection â€” Inter and Nunito are loaded from Google Fonts CDN | Connect to the internet. The UI is fully functional with system fallback fonts; only the visual appearance differs. |
 | **Login screen appears but "Board the Bridge" does nothing** | JavaScript is disabled in the browser | Enable JavaScript. The entire app is a JS application; it cannot run without it. |
 | **`ModuleNotFoundError: No module named 'modules'`** | Python CLI run from the repo root instead of `src/` | `cd src` first, then `python main.py`. |
 | **`ModuleNotFoundError: No module named 'data'`** | Same cause as above | `cd src` first, then `python main.py`. |
 | **`SyntaxError` or `IndentationError` on Python import** | Python version older than 3.8 (f-strings require 3.6+; some walrus-operator style patterns require 3.8+) | Upgrade to Python 3.8 or later. |
 | **Disruption selector change has no effect** | Browser has cached an older version of `dashboard.html` | Hard-reload: `Ctrl+Shift+R` (Windows/Linux) or `Cmd+Shift+R` (macOS). |
-| **Cold-chain alert badge shows wrong count** | Not a bug — badge reflects the number of shipments with at least one non-NORMAL reading, not the total number of readings | Expected behaviour. See `src/modules/cold_chain_monitor.py` for classification logic. |
+| **Cold-chain alert badge shows wrong count** | Not a bug â€” badge reflects the number of shipments with at least one non-NORMAL reading, not the total number of readings | Expected behaviour. See `src/modules/cold_chain_monitor.py` for classification logic. |
 
 ---
 
@@ -141,17 +138,17 @@ DISRUPTION_REASON   = "Port workers' strike causing vessel backlog"  # and this
 
 ```
 src/
-├── dashboard.html          ← open this in a browser to run the full UI
-├── main.py                 ← run this with Python for the CLI
-├── data/
-│   ├── fleet_data.py       ← fleet asset records
-│   ├── sensor_data.py      ← cold-chain sensor readings
-│   └── shipments.py        ← shipment records + route alternatives table
-└── modules/
-    ├── disruption_monitor.py
-    ├── route_optimizer.py
-    ├── fleet_optimizer.py
-    └── cold_chain_monitor.py
+â”œâ”€â”€ dashboard.html          â† open this in a browser to run the full UI
+â”œâ”€â”€ main.py                 â† run this with Python for the CLI
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ fleet_data.py       â† fleet asset records
+â”‚   â”œâ”€â”€ sensor_data.py      â† cold-chain sensor readings
+â”‚   â””â”€â”€ shipments.py        â† shipment records + route alternatives table
+â””â”€â”€ modules/
+    â”œâ”€â”€ disruption_monitor.py
+    â”œâ”€â”€ route_optimizer.py
+    â”œâ”€â”€ fleet_optimizer.py
+    â””â”€â”€ cold_chain_monitor.py
 ```
 
 ---
@@ -166,82 +163,3 @@ Only two things, both in the browser path:
 | Inter + Nunito fonts | Google Fonts | UI falls back to system-ui sans-serif; layout is unaffected |
 
 The Python CLI has **no network dependency whatsoever**.
-=======
-> **This file is read by the automated evaluation pipeline. Be precise and complete.**
-
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- [ ] [e.g., Python 3.11+]
-- [ ] [e.g., Node.js 18+]
-- [ ] [e.g., Docker Desktop]
-- [ ] [e.g., An IBM Cloud account with watsonx.ai access]
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in the values:
-
-```bash
-cp .env.example .env
-```
-
-| Variable | Description | Required |
-|---|---|---|
-| `WATSONX_API_KEY` | Your IBM watsonx.ai API key | Yes |
-| `WATSONX_PROJECT_ID` | Your watsonx.ai project ID | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | No |
-
-## Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/[your-org]/[your-repo].git
-cd [your-repo]
-
-# 2. Install backend dependencies
-[your command — e.g.: pip install -r requirements.txt]
-
-# 3. Install frontend dependencies (if applicable)
-[your command — e.g.: cd frontend && npm install]
-
-# 4. Set up the database (if applicable)
-[your command — e.g.: python manage.py migrate]
-```
-
-## Running the Application
-
-```bash
-# Start the backend
-[your command — e.g.: uvicorn app.main:app --reload]
-
-# Start the frontend (in a separate terminal, if applicable)
-[your command — e.g.: cd frontend && npm run dev]
-```
-
-The application will be available at: `http://localhost:[PORT]`
-
-## Running Tests
-
-```bash
-[your test command — e.g.: pytest tests/ -v]
-```
-
-## Quick Demo (Optional)
-
-If you have a demo script or sample data to showcase the project quickly:
-
-```bash
-[e.g.: python demo/seed_demo_data.py]
-[e.g.: open http://localhost:8000/demo]
-```
-
-## Troubleshooting
-
-| Issue | Solution |
-|---|---|
-| [e.g., `ModuleNotFoundError`] | [e.g., Run `pip install -r requirements.txt` again] |
-| [e.g., Database connection refused] | [e.g., Ensure PostgreSQL is running: `docker compose up db`] |
-| [e.g., watsonx.ai 401 error] | [e.g., Check `WATSONX_API_KEY` in your `.env` file] |
->>>>>>> c3a8fc07675e73485e50b13f34188f3c772b2ef0

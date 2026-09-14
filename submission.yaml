@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 submission:
   title: "R.E.A.C.T. — Resilient Engine for Adaptive Cargo & Transport"
 
@@ -37,8 +36,7 @@ submission:
         receive air-freight options first (e.g. air via Dubai Hub); hazardous cargo
         receives hazmat-certified corridor alternatives. General fallbacks (Cape of
         Good Hope, Trans-Siberian rail, Lombok Strait, Panama Canal) are always
-        appended. Source: src/modules/route_optimizer.py and
-        src/data/shipments.py (ALTERNATIVE_ROUTES).
+        appended.
 
     - name: "Fleet Optimizer with cargo-compatibility matching"
       description: >
@@ -46,28 +44,23 @@ submission:
         depots and global ports, then matches each idle asset to affected shipments
         by comparing the asset's suitable_for list against the shipment's cargo_type.
         Produces a redeployment recommendation table so operators can act on idle
-        capacity immediately. Source: src/modules/fleet_optimizer.py and
-        src/data/fleet_data.py.
+        capacity immediately.
 
     - name: "Cold-Chain Monitor with three-tier temperature classification"
       description: >
         Classifies every sensor reading for sensitive cargo (vaccines, frozen seafood,
         fresh produce, blood samples, industrial chemicals) as NORMAL, WARNING, or
-        CRITICAL. WARNING triggers when the breach is ≤ 3 °C outside the safe range;
-        CRITICAL triggers above 3 °C, prompting immediate action. Results are grouped
-        by shipment and the worst reading per shipment drives the alert badge count in
-        the sidebar. Source: src/modules/cold_chain_monitor.py and
-        src/data/sensor_data.py.
+        CRITICAL. WARNING triggers when the breach is <= 3 degrees C outside the safe
+        range; CRITICAL triggers above 3 degrees C, prompting immediate action.
 
     - name: "Guardian AI conversational assistant"
       description: >
-        A floating chat widget (client-side, no external API) that operators can query
-        in plain English. It understands questions about affected/safe shipments,
-        specific shipment details by ID, idle fleet and vessel counts, India port
-        status (JNPT, Chennai, Cochin, Mundra, Kolkata), alternative routes for the
-        active disruption, cold-chain alerts, and a full dashboard summary. It can
-        also switch the active disruption zone (Suez, Malacca, Pacific, Atlantic,
-        Arabian Sea) on command, re-rendering the entire dashboard in response.
+        A floating chat widget (client-side, rule-based keyword engine — no external
+        API) that operators can query in plain English. It answers questions about
+        affected/safe shipments, idle fleet counts, India port status, alternative
+        routes, cold-chain alerts, and dashboard summaries. It can also switch the
+        active disruption zone on command, re-rendering the entire dashboard.
+        IBM watsonx.ai / Bob integration is the planned next step.
 
 team:
   name: "Frontiers"
@@ -84,74 +77,3 @@ team:
       email: "ranamihir2008@gmail.com"
     - name: "Jaini Khandhar"
       email: "jaini.khandhar@gmail.com"
-=======
-# =============================================================================
-# HACKATHON SUBMISSION METADATA
-# =============================================================================
-# Instructions:
-#   - Fill in ALL required fields (marked with # REQUIRED)
-#   - Optional fields can be left as empty strings ""
-#   - Do NOT rename this file — the evaluation pipeline reads it by name
-#   - Use double quotes around all string values
-# =============================================================================
-
-team:
-  name: ""                             # REQUIRED — e.g., "Orion Squad"
-  track: ""                            # REQUIRED — one of: AI | DevOps | Sustainability | Open
-  lead:
-    name: ""                           # REQUIRED — e.g., "Alice Chen"
-    email: ""                          # REQUIRED — e.g., "alice.chen@ibm.com"
-  members:
-    - name: ""                         # REQUIRED — Team member 1
-      email: ""
-    - name: ""                         # Add more members by copying the two lines above
-      email: ""
-    - name: ""
-      email: ""
-
-submission:
-  title: ""                            # REQUIRED — Project display name, e.g., "SmartOps Dashboard"
-
-  problem_statement: >                 # REQUIRED — 1-3 sentences. What problem? Who has it?
-    Replace this text with a concise description of the real-world problem
-    your project addresses and who experiences it.
-
-  solution_summary: >                  # REQUIRED — 1-3 sentences. What did you build?
-    Replace this text with a clear description of your solution
-    and how it addresses the problem above.
-
-  key_features:                        # REQUIRED — List 3 to 5 specific features you implemented
-    - ""                               # e.g., "Real-time pipeline anomaly detection using watsonx.ai"
-    - ""
-    - ""
-    - ""                               # optional 4th
-    - ""                               # optional 5th
-
-  tech_stack:
-    languages: []                      # REQUIRED — e.g., ["Python", "TypeScript"]
-    frameworks: []                     # e.g., ["FastAPI", "React"]
-    ibm_technologies: []               # e.g., ["watsonx.ai", "IBM Bob", "IBM Cloud Functions"]
-    databases: []                      # e.g., ["PostgreSQL", "Redis"]
-    other: []                          # e.g., ["Docker", "GitHub Actions", "Slack API"]
-
-  what_we_are_most_proud_of: >         # Optional but recommended — guides judges to your best work
-    Replace with what aspect of the submission you consider strongest
-    and want judges to pay special attention to.
-
-  known_limitations: >                 # Optional but recommended — be honest about gaps
-    Replace with any known limitations, incomplete features,
-    or shortcuts taken due to time constraints.
-
-# =============================================================================
-# ARTIFACT LOCATIONS
-# These paths are relative to the repo root. Only change if you moved files.
-# =============================================================================
-artifacts:
-  source_code: "src/"
-  setup_guide: "docs/setup-guide.md"
-  architecture_doc: "docs/architecture.md"
-  demo_video: "demo/demo-video-link.txt"   # URL to hosted video (YouTube, Loom, Box)
-  live_demo: "demo/live-demo-url.txt"      # URL to deployed demo (optional)
-  screenshots: "demo/screenshots/"
-  presentation: "presentation/"
->>>>>>> c3a8fc07675e73485e50b13f34188f3c772b2ef0

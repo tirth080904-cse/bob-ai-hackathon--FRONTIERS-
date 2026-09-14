@@ -1,12 +1,9 @@
-# Solution Overview
-
-<<<<<<< HEAD
-## How R.E.A.C.T. Works — As Actually Implemented in `src/`
+﻿## How R.E.A.C.T. Works â€” As Actually Implemented in `src/`
 
 The platform is built around a single, linear reasoning pipeline that runs every
 time the operator selects or changes the active disruption. Each stage feeds its
 output directly into the next. There is no AI inference, no external API call, and
-no database query — all four stages run in-process, either as Python functions
+no database query â€” all four stages run in-process, either as Python functions
 (CLI path via `src/main.py`) or as JavaScript functions in the browser (dashboard
 path via `src/dashboard.html`). Both paths implement identical logic from the same
 source-of-truth data.
@@ -15,25 +12,25 @@ source-of-truth data.
 
 ## The Five-Stage Pipeline
 
-### Stage 1 — Disruption Selection
+### Stage 1 â€” Disruption Selection
 
 The operator (or Guardian AI, via a chat command) selects one of four active
 disruption zones:
 
 | Disruption zone | Corridors covered |
 |---|---|
-| Suez Canal | Egypt – Red Sea passage |
-| Strait of Malacca | Singapore – Indian Ocean chokepoint |
+| Suez Canal | Egypt â€“ Red Sea passage |
+| Strait of Malacca | Singapore â€“ Indian Ocean chokepoint |
 | Pacific Ocean | Trans-Pacific routes |
 | Atlantic Ocean | Trans-Atlantic routes |
 
 The selected zone is held as `currentDisruption` in the dashboard and as
 `DISRUPTION_LOCATION` in `src/main.py`. Every downstream stage reads from this
-single value — changing it re-runs the entire pipeline automatically.
+single value â€” changing it re-runs the entire pipeline automatically.
 
 ---
 
-### Stage 2 — Shipment Exposure Detection (`disruption_monitor.py`)
+### Stage 2 â€” Shipment Exposure Detection (`disruption_monitor.py`)
 
 **What runs:**
 [`detect_affected_shipments(disruption_location, disruption_reason)`](../src/modules/disruption_monitor.py)
@@ -44,23 +41,23 @@ contained in the route string, the shipment is **Affected**; otherwise it is
 **Safe**.
 
 ```
-"Suez Canal" ∈ "Suez Canal"  → Affected  (SHP-001, SHP-002, SHP-004, SHP-007, SHP-008)
-"Suez Canal" ∈ "Pacific Ocean" → Safe    (SHP-003)
+"Suez Canal" âˆˆ "Suez Canal"  â†’ Affected  (SHP-001, SHP-002, SHP-004, SHP-007, SHP-008)
+"Suez Canal" âˆˆ "Pacific Ocean" â†’ Safe    (SHP-003)
 ```
 
-**Output:** two lists — `affected` (mutable copies, ready to be enriched by
+**Output:** two lists â€” `affected` (mutable copies, ready to be enriched by
 Stage 3) and `safe`. The Operations Dashboard immediately reflects these counts
 in four headline metric cards: Affected Shipments, Safe Shipments, Idle Fleet
 Assets, Cold-Chain Alerts.
 
 **What this stage deliberately does not do:** it does not recommend routes. That
 separation is explicit in the module's opening comment and enforced by the
-function signature — `detect_affected_shipments` returns lists with no
+function signature â€” `detect_affected_shipments` returns lists with no
 `alternatives` key. Route reasoning is handled exclusively in Stage 3.
 
 ---
 
-### Stage 3 — Cargo-Aware Route Recommendations (`route_optimizer.py`)
+### Stage 3 â€” Cargo-Aware Route Recommendations (`route_optimizer.py`)
 
 **What runs:**
 [`recommend_routes(affected_shipments)`](../src/modules/route_optimizer.py)
@@ -70,8 +67,8 @@ key in `ALTERNATIVE_ROUTES` (defined in `src/data/shipments.py`). The lookup
 table is a two-level dict:
 
 ```
-ALTERNATIVE_ROUTES[route][cargo_type]  → cargo-specific alternatives (shown first)
-ALTERNATIVE_ROUTES[route]["all"]       → universal alternatives (always appended)
+ALTERNATIVE_ROUTES[route][cargo_type]  â†’ cargo-specific alternatives (shown first)
+ALTERNATIVE_ROUTES[route]["all"]       â†’ universal alternatives (always appended)
 ```
 
 Cargo-specific keys currently defined: `"perishable"` and `"hazardous"`. A
@@ -85,7 +82,7 @@ prepended before the universal fallbacks:
 | `general` / `heavy` | *(no specific key)* | Universal alternatives only |
 
 If a route is not in the lookup table at all, the shipment gets the string
-`"No pre-defined alternative on file — manual review required"` — so the output
+`"No pre-defined alternative on file â€” manual review required"` â€” so the output
 always has an `alternatives` key; no shipment is ever silently left without
 guidance.
 
@@ -96,10 +93,10 @@ Action Table on the Operations Dashboard uses for its "Recommended Action" colum
 
 ---
 
-### Stage 4 — Fleet Compatibility Matching (`fleet_optimizer.py`)
+### Stage 4 â€” Fleet Compatibility Matching (`fleet_optimizer.py`)
 
 **What runs:**
-[`find_idle_assets(assets)`](../src/modules/fleet_optimizer.py) →
+[`find_idle_assets(assets)`](../src/modules/fleet_optimizer.py) â†’
 [`match_assets_to_shipments(idle_assets, affected_shipments)`](../src/modules/fleet_optimizer.py)
 
 **Exact logic, step by step:**
@@ -117,7 +114,7 @@ Action Table on the Operations Dashboard uses for its "Recommended Action" colum
    ```
 
 3. If no idle asset is compatible with a shipment's cargo type, the entry maps to
-   an empty list and the report states "No compatible idle asset found — manual
+   an empty list and the report states "No compatible idle asset found â€” manual
    sourcing needed."
 
 **Asset types and locations in the current data:**
@@ -134,45 +131,45 @@ recommendation section).
 
 ---
 
-### Stage 5 — Cold-Chain Temperature Classification (`cold_chain_monitor.py`)
+### Stage 5 â€” Cold-Chain Temperature Classification (`cold_chain_monitor.py`)
 
 **What runs:**
 [`analyse_all_readings(readings)`](../src/modules/cold_chain_monitor.py)
-→ [`classify_reading(reading)`](../src/modules/cold_chain_monitor.py) per reading
+â†’ [`classify_reading(reading)`](../src/modules/cold_chain_monitor.py) per reading
 
 **Exact logic:** each reading has a `temperature`, `temp_min`, and `temp_max`.
 The breach amount is calculated as degrees outside the safe range. Classification
-uses a single constant — `WARNING_MARGIN = 3.0` °C — as the threshold:
+uses a single constant â€” `WARNING_MARGIN = 3.0` Â°C â€” as the threshold:
 
 ```
-breach == 0             → NORMAL   (temperature within range)
-0 < breach ≤ 3.0 °C    → WARNING  ("monitor closely — cargo may be at risk")
-breach > 3.0 °C         → CRITICAL ("immediate action required — cargo integrity compromised")
+breach == 0             â†’ NORMAL   (temperature within range)
+0 < breach â‰¤ 3.0 Â°C    â†’ WARNING  ("monitor closely â€” cargo may be at risk")
+breach > 3.0 Â°C         â†’ CRITICAL ("immediate action required â€” cargo integrity compromised")
 ```
 
 Direction is also recorded (`TOO HIGH` / `TOO LOW` / `OK`), producing a
 plain-English reason string with the exact temperature and the safe range
-quoted — so the operator sees not just a status badge but the numbers that
+quoted â€” so the operator sees not just a status badge but the numbers that
 produced it.
 
 **Current sensor data** covers five shipments and 11 readings:
 
 | Shipment | Cargo | Safe range | Worst status in data |
 |---|---|---|---|
-| SHP-101 | Vaccines | 2–8 °C | CRITICAL (14.5 °C → +6.5 °C breach) |
-| SHP-102 | Frozen Seafood | −25 to −15 °C | WARNING (−13.5 °C → +1.5 °C breach) |
-| SHP-103 | Fresh Produce | 2–6 °C | WARNING (1.0 °C → −1.0 °C breach) |
-| SHP-104 | Industrial Chemicals | 15–25 °C | CRITICAL (42.0 °C → +17.0 °C breach) |
-| SHP-105 | Blood Samples | 2–6 °C | NORMAL (both readings within range) |
+| SHP-101 | Vaccines | 2â€“8 Â°C | CRITICAL (14.5 Â°C â†’ +6.5 Â°C breach) |
+| SHP-102 | Frozen Seafood | âˆ’25 to âˆ’15 Â°C | WARNING (âˆ’13.5 Â°C â†’ +1.5 Â°C breach) |
+| SHP-103 | Fresh Produce | 2â€“6 Â°C | WARNING (1.0 Â°C â†’ âˆ’1.0 Â°C breach) |
+| SHP-104 | Industrial Chemicals | 15â€“25 Â°C | CRITICAL (42.0 Â°C â†’ +17.0 Â°C breach) |
+| SHP-105 | Blood Samples | 2â€“6 Â°C | NORMAL (both readings within range) |
 
-**Output:** a `grouped` dict (shipment ID → list of classified readings). The
+**Output:** a `grouped` dict (shipment ID â†’ list of classified readings). The
 worst status per shipment drives the badge count in the sidebar (`nav-badge-dis`,
 `nav-badge` on the Cold-Chain nav button) and the Cold-Chain Alerts table on the
 Operations Dashboard.
 
 ---
 
-## The Connected View — What Makes This Different from a Static Tool
+## The Connected View â€” What Makes This Different from a Static Tool
 
 A static spreadsheet or a plain map with shipment pins answers at most one
 question per view. R.E.A.C.T.'s Operations Dashboard answers all five at once and
@@ -180,19 +177,19 @@ keeps them consistent:
 
 ```
 [ Disruption selector ]
-        │
-        ▼
-[ Stage 2: Affected vs Safe count ]───────────────────────┐
-        │                                                  │
-        ▼                                                  ▼
+        â”‚
+        â–¼
+[ Stage 2: Affected vs Safe count ]â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+        â”‚                                                  â”‚
+        â–¼                                                  â–¼
 [ Stage 3: Alternative routes per shipment ]    [ Stage 4: Idle fleet + match ]
-        │                                                  │
-        └──────────────────────────┬───────────────────────┘
-                                   ▼
+        â”‚                                                  â”‚
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                   â–¼
                     [ Action Table: shipment + action + fleet ]
-                                   │
+                                   â”‚
                     [ Stage 5: Cold-chain alerts table ]
-                                   │
+                                   â”‚
                     [ Priority Actions: next recommended step ]
 ```
 
@@ -205,15 +202,15 @@ different manual updates at different times.
 
 The Live Route Map adds spatial context: disrupted corridors render in red,
 alternative routes in green, safe routes in blue, Indian port and depot pins
-pinned by name — all driven by the same disruption selector, so the map always
+pinned by name â€” all driven by the same disruption selector, so the map always
 matches the tables.
 
 ---
 
-## The Guardian AI Assistant — What It Actually Is
+## The Guardian AI Assistant â€” What It Actually Is
 
 The floating chat widget (`src/dashboard.html`, `guardianAI()` function) is a
-**client-side, keyword-based response engine** — there is no call to IBM
+**client-side, keyword-based response engine** â€” there is no call to IBM
 watsonx.ai, IBM Bob, or any external API. It uses `q.match(/regex/)` pattern
 matching to route the user's lowercase query to one of ~15 response branches,
 each of which reads from the same JavaScript data arrays and computed state
@@ -236,7 +233,7 @@ What it cannot do:
 - Use natural language understanding
 
 **IBM watsonx.ai / Bob integration is not present in this version of the code and
-is the explicitly planned next step.** This is not a gap to hide — it is the
+is the explicitly planned next step.** This is not a gap to hide â€” it is the
 single most impactful upgrade on the roadmap.
 
 ---
@@ -245,50 +242,9 @@ single most impactful upgrade on the roadmap.
 
 | Item | Status |
 |---|---|
-| Live AIS / port-authority data feed | Not present — all shipment, fleet, and sensor data is hardcoded in `src/data/` |
-| Backend server / API | Not present — the dashboard opens as a local HTML file; `src/main.py` is a CLI, not an HTTP server |
-| Database or persistence layer | Not present — state resets on page reload |
+| Live AIS / port-authority data feed | Not present â€” all shipment, fleet, and sensor data is hardcoded in `src/data/` |
+| Backend server / API | Not present â€” the dashboard opens as a local HTML file; `src/main.py` is a CLI, not an HTTP server |
+| Database or persistence layer | Not present â€” state resets on page reload |
 | Authentication | Login screen is cosmetic only; no session validation exists in the code |
-| Indian coastal / road-freight route data | Not modelled — four global sea corridors only |
-| IBM watsonx.ai or LLM integration | Not present — Guardian AI is vanilla JS keyword matching |
-=======
-## What We Built
-
-[Describe your solution in plain language. Avoid jargon — write as if explaining to a smart colleague unfamiliar with your tech stack.]
-
-## How It Works
-
-[Explain the core mechanism step by step. A numbered list or simple flow works well here.]
-
-1. [Step 1: e.g., "User connects their GitHub repository via OAuth"]
-2. [Step 2: e.g., "The system ingests pipeline logs and feeds them to watsonx.ai"]
-3. [Step 3: e.g., "An anomaly score is computed and displayed on the dashboard"]
-4. [Step 4: e.g., "Alerts are sent to Slack when the score exceeds a threshold"]
-
-## Architecture Diagram
-
-> See [`architecture.md`](architecture.md) for the detailed diagram.
-
-[Optionally include a simple ASCII or Mermaid diagram here for quick reference.]
-
-```
-[User] → [Frontend: React] → [API: FastAPI] → [watsonx.ai] → [Dashboard]
-                                    ↓
-                             [PostgreSQL DB]
-```
-
-## Key Design Decisions
-
-| Decision | Rationale |
-|---|---|
-| [e.g., Used watsonx.ai for anomaly detection] | [e.g., Pre-trained models reduced time-to-value vs. building from scratch] |
-| [Decision 2] | [Rationale 2] |
-| [Decision 3] | [Rationale 3] |
-
-## IBM Technologies Used
-
-[Explain specifically HOW you used each IBM technology — not just that you used it.]
-
-- **[IBM Tech 1, e.g., watsonx.ai]:** [How it was used — e.g., "Used the `ibm/granite-13b-instruct-v2` model via the Python SDK to classify anomaly types from log text."]
-- **[IBM Tech 2]:** [How it was used]
->>>>>>> c3a8fc07675e73485e50b13f34188f3c772b2ef0
+| Indian coastal / road-freight route data | Not modelled â€” four global sea corridors only |
+| IBM watsonx.ai or LLM integration | Not present â€” Guardian AI is vanilla JS keyword matching |
