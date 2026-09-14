@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>R.E.A.C.T. — India Operations</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@600;700;800;900&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  /* Pastel palette */
+  --bg:#f0f4ff;
+  --bg2:#e8eeff;
+  --surface:#ffffff;
+  --surface2:#f7f9ff;
+  --border:#dde4f5;
+  --border2:#c8d3f0;
+  /* Pastel accents */
+  --indigo:#6366f1;
+  --indigo-light:#e0e1ff;
+  --indigo-mid:#a5b4fc;
+  --sky:#38bdf8;
+  --sky-light:#e0f2fe;
+  --rose:#f43f5e;
+  --rose-light:#ffe4e6;
+  --amber:#f59e0b;
+  --amber-light:#fef3c7;
+  --emerald:#10b981;
+  --emerald-light:#d1fae5;
+  --violet:#8b5cf6;
+  --violet-light:#ede9fe;
+  --peach:#fb7185;
+  --peach-light:#ffe4e6;
+  --teal:#14b8a6;
+  --teal-light:#ccfbf1;
+  --navy:#1e3a5f;
+  --navy2:#0f2140;
+  /* Text */
+  --text:#1e293b;
+  --text2:#475569;
+  --text3:#94a3b8;
+  --text-inv:#ffffff;
+  /* Ship/ocean theme colors */
+  --ocean:#0ea5e9;
+  --ocean-deep:#0369a1;
+  --wave:#7dd3fc;
+  --sand:#fef3c7;
+  --ship-hull:#1e3a5f;
+}
+
+/* ══ DARK THEME ══ */
+[data-theme="dark"]{
+  --bg:#0f1117;
+  --bg2:#181c27;
+  --surface:#1c2030;
+  --surface2:#222638;
+  --border:#2e3552;
+  --border2:#3a4468;
+  --indigo:#818cf8;
+  --indigo-light:#252a50;
+  --indigo-mid:#4f5faa;
+  --sky:#38bdf8;
+  --sky-light:#0c2a3e;
+  --rose:#fb7185;
+  --rose-light:#2d1220;
+  --amber:#fbbf24;
+  --amber-light:#2c1e06;
+  --emerald:#34d399;
+  --emerald-light:#062a1a;
+  --violet:#a78bfa;
+  --violet-light:#1e1435;
+  --teal-light:#062420;
+  --navy:#2d4a70;
+  --navy2:#c8d8f0;
+  --text:#e2e8f0;
+  --text2:#94a3b8;
+  --text3:#6b7ea8;
+  --ocean:#38bdf8;
+  --wave:#93c5fd;
+}
+
+/* ── Dark mode: targeted text & element fixes ── */
+[data-theme="dark"] th{ color:#8ba3c7; }
+[data-theme="dark"] td{ color:#c8d8f0; }
+[data-theme="dark"] tr:hover td{ background:var(--bg2); }
+[data-theme="dark"] .mc-label,[data-theme="dark"] .mc-delta{ color:#7a94b8; }
+[data-theme="dark"] .mc-gold .mc-value{ color:#fbbf24; }
+[data-theme="dark"] .mc-blue .mc-value{ color:#38bdf8; }
+[data-theme="dark"] .mc-red  .mc-value{ color:#fb7185; }
+[data-theme="dark"] .mc-green .mc-value{ color:#34d399; }
+[data-theme="dark"] .card-head{ background:linear-gradient(135deg,var(--surface2),var(--surface)); color:#d4e4ff; }
+[data-theme="dark"] .section-heading{ color:#d4e4ff; border-color:var(--border); }
+[data-theme="dark"] .page-title{ color:#d4e4ff; }
+[data-theme="dark"] .page-breadcrumb{ color:#6b7ea8; }
+[data-theme="dark"] .page-breadcrumb span{ color:#8ba3c7; }
+[data-theme="dark"] .page-subtitle{ color:#7a94b8; }
+[data-theme="dark"] .action-detail .action-head{ color:#d4e4ff; }
+[data-theme="dark"] .cp-cargo{ color:#d4e4ff; }
+[data-theme="dark"] .cp-shipid{ color:#6b7ea8; }
+[data-theme="dark"] .cp-fleet-none{ color:#6b7ea8; }
+[data-theme="dark"] .cp-route{ color:#7a94b8; }
+[data-theme="dark"] .map-header-title{ color:#d4e4ff; }
+[data-theme="dark"] .map-header-sub{ color:#6b7ea8; }
+[data-theme="dark"] .empty{ color:#6b7ea8; }
+[data-theme="dark"] .legend-item{ color:#7a94b8; }
+[data-theme="dark"] .filter-btn{ background:var(--surface);color:#94a3b8;border-color:var(--border2); }
+[data-theme="dark"] .filter-btn:hover,[data-theme="dark"] .filter-btn.active{ border-color:var(--indigo);color:#c7d2fe;background:var(--indigo-light); }
+[data-theme="dark"] .layer-toggle{ background:var(--surface);color:#94a3b8;border-color:var(--border2); }
+[data-theme="dark"] .layer-toggle.on{ background:var(--indigo-light);color:#c7d2fe;border-color:var(--indigo); }
+[data-theme="dark"] .disruption-selector select,[data-theme="dark"] .map-route-selector select{ background:var(--surface2);color:var(--text);border-color:var(--border2); }
+[data-theme="dark"] .disruption-selector label,[data-theme="dark"] .map-route-selector label{ color:#94a3b8; }
+[data-theme="dark"] .alt-list li{ color:#94a3b8; }
+[data-theme="dark"] .badge-gray{ background:#252a40;color:#94a3b8; }
+[data-theme="dark"] .badge-green{ background:var(--emerald-light);color:#6ee7b7; }
+[data-theme="dark"] .badge-yellow{ background:var(--amber-light);color:#fcd34d; }
+[data-theme="dark"] .badge-red{ background:var(--rose-light);color:#fda4af; }
+[data-theme="dark"] .badge-blue{ background:var(--sky-light);color:#7dd3fc; }
+[data-theme="dark"] .badge-orange{ background:#2c1600;color:#fb923c; }
+[data-theme="dark"] .badge-purple{ background:var(--violet-light);color:#c4b5fd; }
+[data-theme="dark"] .alert-block.high .ab-title{ color:#fda4af; }
+[data-theme="dark"] .alert-block.medium .ab-title{ color:#fcd34d; }
+[data-theme="dark"] .alert-block.low .ab-title{ color:#6ee7b7; }
+[data-theme="dark"] .alert-block .ab-body{ color:#94a3b8; }
+/* About section dark mode */
+[data-theme="dark"] .about-member-name{ color:#d4e4ff; }
+[data-theme="dark"] .about-member-role{ color:#818cf8; }
+[data-theme="dark"] .about-member-bio{ color:#94a3b8; }
+[data-theme="dark"] .about-member-num{ color:#6b7ea8; background:var(--bg2); border-color:var(--border); }
+[data-theme="dark"] .about-skill{ background:rgba(129,140,248,0.15);color:#818cf8;border-color:#3a4468; }
+[data-theme="dark"] .about-greeting-text{ color:#d4e4ff; }
+[data-theme="dark"] .about-greeting-sub{ color:#7a94b8; }
+[data-theme="dark"] .about-contact-label{ color:#6b7ea8; }
+[data-theme="dark"] .about-contact-num{ color:#818cf8; }
+[data-theme="dark"] .about-footer-note{ color:#6b7ea8; }
+
+/* ── Dark mode: sidebar / nav ── */
+[data-theme="dark"] .sidebar{
+  background:linear-gradient(180deg,#0d1525 0%,#111a2e 100%);
+  border-right-color:rgba(56,189,248,0.15);
+}
+[data-theme="dark"] .nav-btn{
+  color:rgba(148,163,184,0.85);
+}
+[data-theme="dark"] .nav-btn:hover{
+  background:rgba(129,140,248,0.1);
+  color:#c7d2fe;
+}
+[data-theme="dark"] .nav-btn.active{
+  background:linear-gradient(90deg,rgba(56,189,248,0.18),rgba(56,189,248,0.04));
+  border-left-color:#38bdf8;
+  color:#e0f2fe;
+}
+[data-theme="dark"] .nav-btn .nav-icon{
+  background:rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .nav-btn:hover .nav-icon{
+  background:rgba(129,140,248,0.18);
+}
+[data-theme="dark"] .nav-btn.active .nav-icon{
+  background:rgba(56,189,248,0.2);
+}
+[data-theme="dark"] .nav-section-label{
+  color:rgba(147,197,253,0.55);
+}
+[data-theme="dark"] .nav-badge.red{
+  background:rgba(244,63,94,0.3);
+  color:#fda4af;
+}
+[data-theme="dark"] .nav-badge.green{
+  background:rgba(52,211,153,0.2);
+  color:#6ee7b7;
+}
+[data-theme="dark"] .sidebar-divider{
+  border-top-color:rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .disruption-widget{
+  background:linear-gradient(135deg,rgba(244,63,94,0.12),rgba(251,113,133,0.05));
+  border-color:rgba(244,63,94,0.25);
+}
+[data-theme="dark"] .dw-title{ color:#fda4af; }
+[data-theme="dark"] .dw-loc{ color:#f1f5f9; }
+[data-theme="dark"] .dw-reason{ color:rgba(148,163,184,0.65); }
+/* topbar stays dark-navy naturally; just fix the sub-line */
+[data-theme="dark"] .topbar-sub{ color:#7dd3fc; font-weight:700; letter-spacing:0.08em; }
+[data-theme="dark"] .about-company-fullform{ color:#7dd3fc; font-weight:700; }
+[data-theme="dark"] .topbar-time{ color:#93c5fd; }
+[data-theme="dark"] .topbar-username{ color:#e2e8f0; }
+[data-theme="dark"] .topbar-logout{ color:#93c5fd; border-color:rgba(255,255,255,0.15); }
+[data-theme="dark"] .topbar-logout:hover{ color:#fda4af; border-color:#fda4af; }
+
+/* ══ SMOOTH THEME TRANSITION ══ */
+*,*::before,*::after{
+  transition:background-color 0.35s ease,color 0.3s ease,border-color 0.3s ease,box-shadow 0.3s ease;
+}
+
+/* ══ THEME TOGGLE BUTTON ══ */
+.theme-toggle{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:20px;
+  border:1.5px solid rgba(255,255,255,0.22);
+  background:rgba(255,255,255,0.08);color:#fff;
+  font-size:0.78rem;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:0.02em;
+  white-space:nowrap;user-select:none;
+}
+.theme-toggle:hover{ background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.4); }
+.tt-track{
+  width:32px;height:18px;border-radius:9px;
+  background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.3);
+  position:relative;flex-shrink:0;
+}
+.tt-thumb{
+  position:absolute;top:2px;left:2px;
+  width:12px;height:12px;border-radius:50%;
+  background:#fff;
+  transition:transform 0.3s cubic-bezier(.4,0,.2,1)!important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.25);
+}
+[data-theme="dark"] .tt-track{ background:rgba(129,140,248,0.4);border-color:rgba(129,140,248,0.6); }
+[data-theme="dark"] .tt-thumb{ transform:translateX(14px); }
+
+/* ══ ABOUT US STYLES ══ */
+.about-company-banner{
+  display:flex;align-items:center;gap:26px;
+  background:linear-gradient(135deg,#0f2140 0%,#1e3a5f 100%);
+  border:1.5px solid rgba(14,165,233,0.3);border-radius:22px;
+  padding:32px 36px;margin-bottom:8px;
+  box-shadow:0 6px 32px rgba(14,165,233,0.12);
+  position:relative;overflow:hidden;
+}
+.about-company-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(99,102,241,0.15),transparent 65%);pointer-events:none;}
+.about-company-logo{
+  font-size:3.4rem;width:80px;height:80px;border-radius:20px;
+  background:linear-gradient(135deg,rgba(14,165,233,0.3),rgba(99,102,241,0.2));
+  border:2px solid rgba(14,165,233,0.4);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 0 30px rgba(14,165,233,0.25);
+}
+.about-company-name{
+  font-family:'Nunito',sans-serif;font-size:3.2rem;font-weight:900;
+  background:linear-gradient(135deg,#fff 0%,#ffe066 55%,#7dd3fc 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;margin-bottom:5px;letter-spacing:0.1em;
+}
+.about-company-fullform{
+  font-size:0.88rem;font-weight:600;letter-spacing:0.03em;
+  color:rgba(200,230,255,0.85);margin-bottom:10px;font-style:italic;
+}
+.about-team-name-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(245,200,66,0.18);border:1.5px solid rgba(245,200,66,0.45);
+  color:#ffe066;font-size:0.75rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;margin-bottom:12px;
+}
+.about-company-info{display:flex;flex-direction:column;flex:1;min-width:0;}
+.about-company-desc{font-size:0.86rem;color:rgba(220,235,255,0.92);line-height:1.65;max-width:600px;position:relative;z-index:1;}
+.about-greeting-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;
+  padding:18px 24px;margin:18px 0 4px;
+  box-shadow:0 2px 12px rgba(99,102,241,0.06);
+}
+.about-greeting-left{display:flex;align-items:flex-start;gap:14px;}
+.about-greeting-wave{font-size:1.9rem;line-height:1;flex-shrink:0;}
+.about-greeting-text{font-size:0.96rem;font-weight:700;color:var(--navy2);margin-bottom:3px;}
+.about-greeting-sub{font-size:0.8rem;color:var(--text2);line-height:1.5;}
+.about-contact-pill{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--indigo-light),var(--sky-light));
+  border:1.5px solid var(--border2);border-radius:14px;padding:10px 18px;
+}
+.about-contact-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);}
+.about-contact-num{font-size:1rem;font-weight:900;color:var(--indigo);text-decoration:none;font-family:'Nunito',sans-serif;}
+.about-contact-num:hover{text-decoration:underline;}
+.about-team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-bottom:28px;}
+.about-member-card{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:20px;
+  padding:26px 22px 20px;position:relative;overflow:hidden;
+  box-shadow:0 2px 14px rgba(99,102,241,0.06);
+  transition:transform 0.22s,box-shadow 0.22s;cursor:default;
+}
+.about-member-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(99,102,241,0.14);}
+.about-avatar{
+  width:62px;height:62px;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:900;color:#fff;
+  margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,0.18);
+}
+.about-member-num{
+  position:absolute;top:18px;right:18px;
+  font-size:0.65rem;font-weight:900;letter-spacing:0.1em;
+  color:var(--text3);background:var(--bg2);
+  padding:3px 9px;border-radius:10px;border:1px solid var(--border);
+}
+.about-member-name{font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:900;color:var(--navy2);margin-bottom:3px;}
+.about-member-role{font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--indigo);margin-bottom:12px;}
+.about-member-bio{font-size:0.81rem;color:var(--text2);line-height:1.6;margin-bottom:14px;}
+.about-member-skills{display:flex;flex-wrap:wrap;gap:6px;}
+.about-skill{font-size:0.67rem;font-weight:700;padding:3px 10px;border-radius:10px;background:var(--indigo-light);color:var(--indigo);border:1px solid var(--border2);letter-spacing:0.03em;}
+.about-footer-note{
+  text-align:center;font-size:0.82rem;color:var(--text3);
+  padding:18px 0 6px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--indigo-mid);border-radius:3px;}
+
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ══ STARFIELD ══ */
+.stars-canvas{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--dur,4s) ease-in-out var(--del,0s) infinite;}
+@keyframes twinkle{0%,100%{opacity:var(--maxop,0.7);transform:scale(1);}50%{opacity:0.1;transform:scale(0.6);}}
+.shooting-star{position:absolute;height:2px;background:linear-gradient(90deg,rgba(255,255,255,0.9),transparent);border-radius:2px;animation:shoot var(--sdur,3s) linear var(--sdel,0s) infinite;opacity:0;}
+@keyframes shoot{0%{opacity:0;transform:translateX(0) translateY(0);}5%{opacity:1;}60%{opacity:0.4;}100%{opacity:0;transform:translateX(300px) translateY(120px);}}
+
+/* ══ LOGIN SCREEN ══ */
+#login-screen{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#000a1a 0%,#001228 30%,#001a38 55%,#002048 75%,#001830 100%);
+  overflow-y:auto;padding:20px;
+}
+.titanic-iceberg{position:absolute;bottom:36%;left:8%;width:160px;height:200px;background:linear-gradient(180deg,rgba(180,220,255,0.25) 0%,rgba(140,200,255,0.12) 100%);clip-path:polygon(30% 0%,60% 0%,80% 25%,100% 40%,85% 60%,70% 70%,60% 100%,40% 100%,30% 72%,15% 60%,0% 42%,18% 22%);filter:blur(1px);animation:iceFloat 8s ease-in-out infinite;}
+.titanic-iceberg2{position:absolute;bottom:33%;right:10%;width:90px;height:120px;background:linear-gradient(180deg,rgba(160,210,255,0.18) 0%,rgba(120,190,255,0.08) 100%);clip-path:polygon(20% 0%,70% 0%,90% 30%,100% 50%,80% 70%,55% 100%,25% 100%,5% 65%,0% 40%,15% 18%);filter:blur(0.5px);animation:iceFloat 12s ease-in-out 3s infinite;}
+@keyframes iceFloat{0%,100%{transform:translateY(0) rotate(-0.5deg);}50%{transform:translateY(-6px) rotate(0.5deg);}}
+.titanic-ship{position:absolute;bottom:36%;left:50%;transform:translateX(-50%);width:420px;z-index:2;animation:shipDrift 12s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(0,60,120,0.7));}
+@keyframes shipDrift{0%,100%{transform:translateX(-50%) translateY(0) rotate(0deg);}33%{transform:translateX(-50%) translateY(-5px) rotate(0.3deg);}66%{transform:translateX(-50%) translateY(3px) rotate(-0.3deg);}}
+.titanic-ocean{position:absolute;bottom:0;left:0;right:0;height:38%;background:linear-gradient(180deg,#001828 0%,#001020 40%,#000810 100%);z-index:1;}
+.titanic-ocean::before{content:'';position:absolute;top:-1px;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(0,150,200,0.4),rgba(100,200,255,0.3),rgba(0,150,200,0.4),transparent);animation:horizonGlow 4s ease-in-out infinite;}
+@keyframes horizonGlow{0%,100%{opacity:0.5;}50%{opacity:1;}}
+.ocean-wave{position:absolute;left:0;right:0;height:40px;background:linear-gradient(90deg,transparent 0%,rgba(0,120,180,0.08) 30%,rgba(0,180,255,0.12) 50%,rgba(0,120,180,0.08) 70%,transparent 100%);animation:waveRipple var(--wd,6s) ease-in-out var(--wdel,0s) infinite;}
+@keyframes waveRipple{0%,100%{transform:translateX(-10%) scaleY(1);}50%{transform:translateX(5%) scaleY(1.3);}}
+.moon-reflection{position:absolute;left:50%;transform:translateX(-50%);top:0;width:40px;background:linear-gradient(180deg,rgba(255,240,160,0.25) 0%,transparent 100%);height:100%;}
+.moon{position:absolute;top:8%;right:18%;width:60px;height:60px;background:radial-gradient(circle at 38% 38%,#fff8d0,#ffe88a 60%,#e8c840 100%);border-radius:50%;box-shadow:0 0 40px rgba(255,230,100,0.4),0 0 80px rgba(255,230,100,0.15);animation:moonGlow 6s ease-in-out infinite;}
+@keyframes moonGlow{0%,100%{box-shadow:0 0 40px rgba(255,230,100,0.4),0 0 80px rgba(255,230,100,0.15);}50%{box-shadow:0 0 60px rgba(255,230,100,0.6),0 0 120px rgba(255,230,100,0.25);}}
+
+.login-box{
+  position:relative;z-index:10;
+  width:420px;max-width:95vw;
+  background:linear-gradient(160deg,rgba(0,10,30,0.92) 0%,rgba(0,6,20,0.95) 100%);
+  border:1px solid rgba(100,160,255,0.25);
+  border-radius:22px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(100,160,255,0.1),0 32px 80px rgba(0,0,0,0.85),inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter:blur(16px);
+  animation:cardFloat 8s ease-in-out infinite;
+  margin:auto;
+}
+@keyframes cardFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#c87000,#f5c842,#ffe066,#e8a020,#c87000);}
+.bolt{position:absolute;width:8px;height:8px;border-radius:50%;background:#e8a020;box-shadow:0 0 5px rgba(245,200,66,0.5);}
+.bolt-tl{top:14px;left:14px;}.bolt-tr{top:14px;right:14px;}
+.login-header{padding:32px 36px 18px;text-align:center;position:relative;}
+.login-ship-icon{font-size:2.6rem;margin-bottom:10px;display:block;filter:drop-shadow(0 0 16px rgba(100,180,255,0.7));animation:iconBob 4s ease-in-out infinite;}
+@keyframes iconBob{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-5px) rotate(1deg);}}
+.login-brand{font-family:'Nunito',sans-serif;font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#ffe066 50%,#aad4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:3px;}
+.login-tagline{font-size:0.72rem;color:rgba(150,200,255,0.7);letter-spacing:0.1em;text-transform:uppercase;}
+.login-titanic-label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,200,66,0.6);margin-top:6px;border-top:1px solid rgba(245,200,66,0.15);padding-top:6px;}
+.login-form{padding:0 36px 32px;display:flex;flex-direction:column;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:0.72rem;font-weight:700;color:rgba(150,200,255,0.8);text-transform:uppercase;letter-spacing:0.06em;}
+.form-input-wrap{position:relative;}
+.form-input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:0.95rem;opacity:0.45;}
+.form-input{width:100%;padding:11px 13px 11px 40px;background:rgba(0,20,50,0.6);border:1px solid rgba(100,160,255,0.2);border-radius:10px;font-size:0.88rem;color:#e8f4ff;outline:none;transition:border-color 0.2s,box-shadow 0.2s;font-family:'Inter',sans-serif;}
+.form-input::placeholder{color:rgba(150,200,255,0.25);}
+.form-input:focus{border-color:rgba(100,180,255,0.6);box-shadow:0 0 0 3px rgba(100,180,255,0.1);}
+.login-btn{padding:13px;background:linear-gradient(135deg,#1a4a8a,#0d2d60);border:1px solid rgba(100,180,255,0.35);border-radius:10px;font-size:0.92rem;font-weight:700;color:#aad4ff;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 20px rgba(0,60,160,0.5);font-family:'Inter',sans-serif;letter-spacing:0.03em;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,80,200,0.7);color:#fff;}
+.login-divider{display:flex;align-items:center;gap:10px;font-size:0.68rem;color:rgba(150,200,255,0.3);}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(100,160,255,0.1);}
+.demo-accounts{display:flex;flex-direction:column;gap:7px;}
+.demo-account{padding:8px 12px;background:rgba(0,20,50,0.4);border:1px solid rgba(100,160,255,0.12);border-radius:9px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background 0.15s;font-size:0.76rem;}
+.demo-account:hover{background:rgba(0,40,90,0.6);border-color:rgba(100,180,255,0.25);}
+.demo-account .da-name{font-weight:600;color:#c8e4ff;}
+.demo-account .da-role{color:rgba(150,200,255,0.6);}
+.demo-account .da-use{font-size:0.64rem;font-weight:700;background:rgba(0,80,180,0.4);color:#7ab8ff;padding:2px 8px;border-radius:5px;}
+
+/* ══ WELCOME SPLASH ══ */
+#welcome-screen{position:fixed;inset:0;z-index:8000;display:none;background:radial-gradient(ellipse at 30% 40%,#1a0a40 0%,#0a0e27 50%,#000d1a 100%);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;}
+.welcome-ocean{position:absolute;bottom:0;left:0;right:0;height:220px;overflow:hidden;}
+.welcome-wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:linear-gradient(180deg,transparent 40%,rgba(14,165,233,0.12) 100%);border-radius:50% 50% 0 0 / 40% 40% 0 0;}
+.welcome-wave1{animation:waveMove 6s ease-in-out infinite;}
+.welcome-wave2{opacity:0.5;animation:waveMove 9s ease-in-out infinite reverse;}
+@keyframes waveMove{0%,100%{transform:translateX(-10%);}50%{transform:translateX(0%);}}
+.welcome-content{position:relative;z-index:1;text-align:center;padding:40px 20px;animation:welcomeIn 0.8s ease-out;}
+@keyframes welcomeIn{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:none;}}
+.welcome-ship{font-size:5rem;display:block;margin:0 auto 24px;animation:sailIn 1.2s ease-out, bob 3s ease-in-out 1.2s infinite;filter:drop-shadow(0 0 30px rgba(99,102,241,0.6));}
+@keyframes sailIn{from{transform:translateX(-100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-8px) rotate(1deg);}}
+.welcome-title{font-family:'Nunito',sans-serif;font-size:3rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#f5c842 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:12px;}
+.welcome-subtitle{font-size:1rem;color:rgba(200,220,255,0.7);margin-bottom:8px;}
+.welcome-user-msg{font-size:1.3rem;font-weight:700;color:#f5c842;margin-bottom:32px;}
+.welcome-stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.welcome-stat{text-align:center;}
+.welcome-stat .ws-val{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#38bdf8,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.welcome-stat .ws-lbl{font-size:0.72rem;color:rgba(200,220,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+.welcome-enter-btn{padding:16px 48px;background:linear-gradient(135deg,#f5c842,#e8a020);border:none;border-radius:14px;font-size:1rem;font-weight:800;color:#1a0a00;cursor:pointer;letter-spacing:0.04em;box-shadow:0 6px 30px rgba(245,200,66,0.4);transition:transform 0.2s,box-shadow 0.2s;font-family:'Inter',sans-serif;}
+.welcome-enter-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(245,200,66,0.6);}
+
+/* ══ MAIN APP ══ */
+#app{display:none;flex-direction:column;min-height:100vh;background:var(--bg);}
+#app.visible{display:flex;}
+
+/* ── TOPBAR ── */
+.topbar{height:68px;background:linear-gradient(135deg,var(--navy2) 0%,var(--navy) 100%);border-bottom:3px solid var(--ocean);display:flex;align-items:center;gap:16px;padding:0 28px;position:sticky;top:0;z-index:500;box-shadow:0 4px 20px rgba(14,165,233,0.2);}
+.topbar-logo{display:flex;align-items:center;gap:12px;}
+.topbar-logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--ocean),var(--indigo));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 14px rgba(14,165,233,0.4);animation:bob 3s ease-in-out infinite;}
+.topbar-name{font-family:'Nunito',sans-serif;font-size:1.22rem;font-weight:900;color:#fff;letter-spacing:0.01em;}
+.topbar-sub{font-size:0.66rem;color:var(--wave);margin-top:-2px;letter-spacing:0.06em;text-transform:uppercase;}
+.topbar-spacer{flex:1;}
+.topbar-badge{background:rgba(244,63,94,0.2);border:1px solid rgba(244,63,94,0.45);color:#fda4af;font-size:0.72rem;font-weight:700;padding:5px 14px;border-radius:20px;animation:pulseBadge 2s ease-in-out infinite;}
+@keyframes pulseBadge{0%,100%{opacity:1;}50%{opacity:0.65;}}
+.topbar-time{font-size:0.8rem;font-weight:700;color:var(--wave);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);padding:6px 14px;border-radius:10px;}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;cursor:pointer;}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ocean),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;color:#fff;}
+.topbar-username{font-size:0.8rem;font-weight:600;color:#fff;}
+.topbar-logout{font-size:0.72rem;padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--wave);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.topbar-logout:hover{border-color:#fda4af;color:#fda4af;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:245px;min-width:245px;background:linear-gradient(180deg,var(--navy2) 0%,var(--navy) 100%);border-right:1px solid rgba(14,165,233,0.2);display:flex;flex-direction:column;padding:20px 0;overflow-y:auto;}
+.nav-section-label{font-size:0.62rem;font-weight:800;letter-spacing:0.14em;color:var(--wave);text-transform:uppercase;padding:0 18px 8px;margin-top:8px;opacity:0.7;}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:11px 18px;cursor:pointer;font-size:0.84rem;font-weight:600;color:rgba(200,230,255,0.7);border:none;background:none;width:100%;text-align:left;border-left:3px solid transparent;transition:all 0.18s;font-family:'Inter',sans-serif;}
+.nav-btn:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.nav-btn.active{background:linear-gradient(90deg,rgba(14,165,233,0.2),rgba(14,165,233,0.04));border-left-color:var(--ocean);color:#fff;font-weight:700;}
+.nav-btn .nav-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(255,255,255,0.06);transition:background 0.18s;}
+.nav-btn.active .nav-icon{background:rgba(14,165,233,0.25);}
+.nav-badge{margin-left:auto;font-size:0.65rem;font-weight:800;padding:2px 7px;border-radius:10px;}
+.nav-badge.red{background:rgba(244,63,94,0.25);color:#fda4af;}
+.nav-badge.green{background:rgba(16,185,129,0.2);color:#6ee7b7;}
+.sidebar-divider{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:10px 14px;}
+.disruption-widget{margin:10px 12px;background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(251,113,133,0.07));border:1px solid rgba(244,63,94,0.3);border-radius:14px;padding:13px;}
+.dw-title{font-size:0.66rem;font-weight:800;letter-spacing:0.08em;color:#fda4af;text-transform:uppercase;margin-bottom:6px;}
+.dw-loc{font-size:0.88rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;}
+.dw-loc::before{content:'';width:8px;height:8px;border-radius:50%;background:#f43f5e;flex-shrink:0;animation:pulseDot 1.5s ease-in-out infinite;}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
+.dw-reason{font-size:0.72rem;color:rgba(200,220,255,0.6);margin-top:4px;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;background:var(--bg);padding:26px 30px;}
+.page{display:none;animation:pageIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:26px;}
+.page-title{font-size:1.5rem;font-weight:800;color:var(--navy2);display:flex;align-items:center;gap:12px;margin-bottom:4px;font-family:'Nunito',sans-serif;}
+.page-title-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:linear-gradient(135deg,var(--indigo-light),var(--sky-light));border:1px solid var(--border2);}
+.page-subtitle{font-size:0.82rem;color:var(--text2);margin-left:56px;}
+.page-breadcrumb{font-size:0.72rem;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.page-breadcrumb span{color:var(--text2);}
+
+/* ── METRICS ROW ── */
+.metrics-row{display:flex;gap:16px;margin-bottom:26px;flex-wrap:wrap;}
+.metric-card{flex:1;min-width:150px;background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:20px 22px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:default;box-shadow:0 2px 12px rgba(99,102,241,0.06);}
+.metric-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(99,102,241,0.12);}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:18px 18px 0 0;}
+.metric-card.mc-gold::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.metric-card.mc-blue::before{background:linear-gradient(90deg,#38bdf8,#818cf8);}
+.metric-card.mc-red::before{background:linear-gradient(90deg,#f43f5e,#fb7185);}
+.metric-card.mc-green::before{background:linear-gradient(90deg,#10b981,#34d399);}
+.metric-card .mc-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:14px;}
+.mc-gold .mc-icon{background:var(--amber-light);}
+.mc-blue .mc-icon{background:var(--sky-light);}
+.mc-red .mc-icon{background:var(--rose-light);}
+.mc-green .mc-icon{background:var(--emerald-light);}
+.metric-card .mc-label{font-size:0.7rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.metric-card .mc-value{font-size:2.4rem;font-weight:900;line-height:1;font-family:'Nunito',sans-serif;}
+.mc-gold .mc-value{color:#d97706;}
+.mc-blue .mc-value{color:#0284c7;}
+.mc-red .mc-value{color:#e11d48;}
+.mc-green .mc-value{color:#059669;}
+.metric-card .mc-delta{font-size:0.72rem;color:var(--text3);margin-top:6px;}
+
+/* Ship decoration on metric cards */
+.metric-card .mc-deco{position:absolute;bottom:-8px;right:-8px;font-size:2.5rem;opacity:0.07;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 12px rgba(99,102,241,0.05);}
+.card-head{padding:15px 22px;border-bottom:1px solid var(--border);font-size:0.88rem;font-weight:700;color:var(--navy2);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--surface2),var(--surface));}
+.card-head .ch-icon{width:28px;height:28px;border-radius:8px;background:var(--indigo-light);display:flex;align-items:center;justify-content:center;font-size:0.85rem;}
+.card-head .ch-actions{margin-left:auto;display:flex;gap:8px;}
+.card-body{padding:0;}
+
+/* ── TABLES ── */
+table{width:100%;border-collapse:collapse;font-size:0.83rem;}
+th{background:var(--bg2);color:var(--text3);font-weight:700;text-align:left;padding:11px 18px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--border);}
+td{padding:13px 18px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg2);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.68rem;font-weight:700;white-space:nowrap;}
+.badge-green {background:var(--emerald-light);color:#065f46;}
+.badge-yellow{background:var(--amber-light);color:#92400e;}
+.badge-red   {background:var(--rose-light);color:#9f1239;}
+.badge-blue  {background:var(--sky-light);color:#0369a1;}
+.badge-orange{background:#fff7ed;color:#c2410c;}
+.badge-gray  {background:#f1f5f9;color:#475569;}
+.badge-purple{background:var(--violet-light);color:#5b21b6;}
+
+/* ── ALERTS ── */
+.alert-block{border-radius:14px;padding:16px 20px;margin-bottom:20px;border-left:4px solid;display:flex;gap:14px;align-items:flex-start;}
+.alert-block.high{background:var(--rose-light);border-color:var(--rose);}
+.alert-block.medium{background:var(--amber-light);border-color:var(--amber);}
+.alert-block.low{background:var(--emerald-light);border-color:var(--emerald);}
+.alert-block .ab-icon{font-size:1.4rem;flex-shrink:0;}
+.alert-block .ab-title{font-weight:800;font-size:0.9rem;margin-bottom:3px;}
+.alert-block.high .ab-title{color:#9f1239;}
+.alert-block.medium .ab-title{color:#92400e;}
+.alert-block.low .ab-title{color:#065f46;}
+.alert-block .ab-body{font-size:0.82rem;color:var(--text2);line-height:1.6;}
+
+/* ── ALT LIST ── */
+.alt-list{list-style:none;padding:0;margin:0;}
+.alt-list li{padding:10px 0;font-size:0.83rem;color:var(--text2);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.alt-list li:last-child{border-bottom:none;}
+.alt-tag{font-size:0.64rem;padding:2px 8px;border-radius:8px;font-weight:800;white-space:nowrap;margin-top:2px;flex-shrink:0;letter-spacing:0.04em;}
+.tag-best{background:var(--violet-light);color:#5b21b6;}
+.tag-general{background:#f1f5f9;color:#475569;}
+
+/* ── NEXT ACTIONS ── */
+.next-action-item{display:flex;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);align-items:flex-start;}
+.next-action-item:last-child{border-bottom:none;}
+.action-num{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;font-weight:900;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;}
+.action-num.urgent{background:linear-gradient(135deg,var(--rose),#e11d48);}
+.action-detail .action-head{font-size:0.88rem;font-weight:700;color:var(--navy2);margin-bottom:3px;}
+.action-detail .action-sub{font-size:0.78rem;color:var(--text2);line-height:1.55;}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:0.75rem;cursor:pointer;transition:all 0.15s;font-weight:600;font-family:'Inter',sans-serif;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-light);}
+
+/* ── DISRUPTION SELECTOR ── */
+.disruption-selector{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.disruption-selector label{font-size:0.78rem;color:var(--text2);font-weight:600;}
+.disruption-selector select{background:var(--surface);border:1.5px solid var(--border2);color:var(--text);padding:8px 14px;border-radius:10px;font-size:0.84rem;cursor:pointer;font-family:'Inter',sans-serif;outline:none;}
+.disruption-selector select:focus{border-color:var(--indigo);}
+.btn-run{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;border:none;padding:9px 20px;border-radius:10px;font-size:0.84rem;font-weight:700;cursor:pointer;transition:opacity 0.15s;font-family:'Inter',sans-serif;}
+.btn-run:hover{opacity:0.88;}
+
+/* ── TEMP BAR ── */
+.temp-bar-wrap{display:flex;align-items:center;gap:10px;}
+.temp-bar-bg{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.temp-bar-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:0.88rem;}
+.empty .emoji{font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.4;}
+
+/* ══ MAP STYLES ══ */
+.map-container{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;box-shadow:0 4px 20px rgba(14,165,233,0.1);}
+.map-header{padding:15px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--sky-light),var(--surface));flex-wrap:wrap;}
+.map-header-title{font-size:0.88rem;font-weight:700;color:var(--navy2);}
+.map-header-sub{font-size:0.72rem;color:var(--text2);margin-left:auto;}
+#leaflet-map{width:100%;height:560px;z-index:1;background:#e8f4f8;}
+.map-route-selector{display:flex;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;background:var(--surface2);}
+.map-route-selector label{font-size:0.78rem;font-weight:600;color:var(--text2);}
+.map-route-selector select{background:var(--surface);border:1.5px solid var(--border2);color:var(--text);padding:7px 13px;border-radius:9px;font-size:0.83rem;cursor:pointer;font-family:'Inter',sans-serif;outline:none;min-width:200px;}
+.map-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 22px;background:var(--surface2);border-top:1px solid var(--border);font-size:0.75rem;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:7px;font-weight:600;color:var(--text2);}
+.legend-line{width:28px;height:4px;border-radius:2px;}
+.legend-dash{width:28px;height:0;border-top:3px dashed currentColor;opacity:0.8;}
+.map-layer-controls{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.layer-toggle{padding:5px 14px;border-radius:16px;border:1.5px solid var(--border2);background:var(--surface);font-size:0.73rem;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;color:var(--text2);}
+.layer-toggle.on{border-color:var(--indigo);background:var(--indigo-light);color:var(--indigo);}
+/* Leaflet custom marker overrides */
+.leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 30px rgba(0,0,0,0.15)!important;border:1px solid var(--border)!important;font-family:'Inter',sans-serif!important;}
+.leaflet-popup-content{font-size:0.83rem!important;line-height:1.55!important;margin:10px 14px!important;}
+.leaflet-popup-tip{background:var(--surface)!important;}
+.leaflet-tooltip{border-radius:8px!important;font-family:'Inter',sans-serif!important;font-size:0.78rem!important;border:1px solid var(--border2)!important;box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;}
+.map-pin-port{background:#f59e0b;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #f59e0b,0 2px 8px rgba(245,158,11,0.5);}
+.map-pin-depot{background:#8b5cf6;width:12px;height:12px;border-radius:3px;border:2px solid #fff;box-shadow:0 0 0 2px #8b5cf6,0 2px 6px rgba(139,92,246,0.5);transform:rotate(45deg);}
+.map-truck-icon{font-size:16px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
+.map-ship-icon{font-size:18px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
+
+/* ══ CARGO PRIORITY PANEL ══ */
+.cargo-priority-section{margin-bottom:24px;}
+.cargo-priority-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.cp-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 2px 10px rgba(0,0,0,0.04);}
+.cp-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08);}
+.cp-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:3px 0 0 3px;}
+.cp-card.urgency-critical::before{background:linear-gradient(180deg,#f43f5e,#e11d48);}
+.cp-card.urgency-high::before{background:linear-gradient(180deg,#f59e0b,#d97706);}
+.cp-card.urgency-medium::before{background:linear-gradient(180deg,#38bdf8,#0284c7);}
+.cp-card.urgency-low::before{background:linear-gradient(180deg,#10b981,#059669);}
+.cp-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.cp-cargo-icon{font-size:1.6rem;flex-shrink:0;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.cp-card.urgency-critical .cp-cargo-icon{background:var(--rose-light);}
+.cp-card.urgency-high .cp-cargo-icon{background:var(--amber-light);}
+.cp-card.urgency-medium .cp-cargo-icon{background:var(--sky-light);}
+.cp-card.urgency-low .cp-cargo-icon{background:var(--emerald-light);}
+.cp-meta{}
+.cp-shipid{font-size:0.72rem;color:var(--text3);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;}
+.cp-cargo{font-size:0.95rem;font-weight:800;color:var(--navy2);margin-top:1px;}
+.cp-type-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.cp-urgency-badge{font-size:0.62rem;font-weight:800;padding:2px 8px;border-radius:6px;letter-spacing:0.06em;text-transform:uppercase;}
+.urgency-critical .cp-urgency-badge{background:var(--rose-light);color:#9f1239;}
+.urgency-high .cp-urgency-badge{background:var(--amber-light);color:#92400e;}
+.urgency-medium .cp-urgency-badge{background:var(--sky-light);color:#0369a1;}
+.urgency-low .cp-urgency-badge{background:var(--emerald-light);color:#065f46;}
+.cp-route{font-size:0.78rem;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.cp-route-arrow{color:var(--text3);font-size:0.7rem;}
+.cp-fleet-row{background:var(--bg2);border-radius:8px;padding:8px 10px;font-size:0.78rem;}
+.cp-fleet-label{color:var(--text3);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;font-weight:700;}
+.cp-fleet-asset{display:flex;align-items:center;gap:6px;color:var(--text);font-weight:600;}
+.cp-fleet-none{color:var(--text3);font-style:italic;font-size:0.76rem;}
+.cp-alt{margin-top:8px;padding:8px 10px;background:var(--emerald-light);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:0.76rem;color:#065f46;display:flex;gap:6px;align-items:flex-start;}
+
+/* ══ CHATBOX ══ */
+.chat-fab{position:fixed;bottom:28px;right:28px;width:62px;height:62px;background:linear-gradient(135deg,var(--indigo),var(--violet));border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-size:1.5rem;box-shadow:0 6px 24px rgba(99,102,241,0.5);z-index:2000;transition:transform 0.2s,box-shadow 0.2s;}
+.chat-fab:hover{transform:scale(1.1);box-shadow:0 8px 32px rgba(99,102,241,0.7);}
+.chat-fab .cf-notif{position:absolute;top:4px;right:4px;width:16px;height:16px;background:var(--rose);border-radius:50%;border:2px solid var(--surface);font-size:0.55rem;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
+.chat-panel{position:fixed;bottom:106px;right:28px;width:400px;height:560px;background:var(--surface);border:1.5px solid var(--border2);border-radius:22px;box-shadow:0 16px 60px rgba(99,102,241,0.2);display:flex;flex-direction:column;z-index:1999;overflow:hidden;transition:opacity 0.25s,transform 0.25s;}
+.chat-panel.hidden{opacity:0;pointer-events:none;transform:translateY(20px) scale(0.97);}
+.chat-header{background:linear-gradient(135deg,var(--navy2),var(--navy));border-bottom:1px solid rgba(255,255,255,0.1);padding:14px 18px;display:flex;align-items:center;gap:10px;}
+.chat-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ocean),var(--indigo));display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 0 16px rgba(14,165,233,0.5);}
+.chat-title-wrap .chat-title{font-weight:700;font-size:0.9rem;color:#fff;}
+.chat-title-wrap .chat-status{font-size:0.68rem;color:#6ee7b7;display:flex;align-items:center;gap:4px;}
+.chat-title-wrap .chat-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#6ee7b7;display:inline-block;}
+.chat-close{margin-left:auto;cursor:pointer;font-size:1rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.chat-close:hover{background:rgba(244,63,94,0.3);border-color:#fda4af;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--bg);}
+.chat-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:0.82rem;line-height:1.55;}
+.chat-msg.bot{background:var(--surface);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.chat-msg.user{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;border-bottom-right-radius:4px;align-self:flex-end;box-shadow:0 4px 16px rgba(99,102,241,0.3);}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 12px;background:var(--bg);}
+.chat-chip{padding:5px 12px;border-radius:20px;background:var(--indigo-light);color:var(--indigo);font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);transition:all 0.15s;}
+.chat-chip:hover{background:var(--indigo);color:#fff;}
+.chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--surface);}
+.chat-input{flex:1;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:0.83rem;outline:none;transition:border-color 0.15s;font-family:'Inter',sans-serif;}
+.chat-input:focus{border-color:var(--indigo);}
+.chat-send{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),var(--violet));border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.35);}
+
+/* ── Ship/truck decorative elements ── */
+.ship-deco{font-size:1.2rem;opacity:0.25;}
+.wave-deco{display:flex;align-items:center;gap:4px;opacity:0.3;font-size:0.8rem;}
+
+/* ── Pastel section headings ── */
+.section-heading{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--navy2);display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border);}
+.section-heading-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--indigo-light),var(--sky-light));display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+
+@media(max-width:768px){
+  .sidebar{width:58px;min-width:58px;}
+  .nav-btn .nav-label,.nav-section-label,.disruption-widget,.sidebar-divider{display:none;}
+  .content{padding:14px;}
+  .metrics-row{gap:10px;}
+  .chat-panel{width:calc(100vw - 20px);right:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="stars-canvas" id="login-stars"></div>
+  <div class="moon"></div>
+  <div class="titanic-iceberg"></div>
+  <div class="titanic-iceberg2"></div>
+  <svg class="titanic-ship" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10,85 L30,75 L380,72 L410,82 L400,95 L20,98 Z" fill="#0a1828" stroke="#1a3a5c" stroke-width="1"/>
+    <line x1="28" y1="75" x2="382" y2="72" stroke="#1e4060" stroke-width="1.5"/>
+    <path d="M380,72 L415,80 L400,95" fill="#0d2040" stroke="#1a3a5c" stroke-width="0.8"/>
+    <path d="M10,85 L2,90 L20,98" fill="#0d2040" stroke="#1a3a5c" stroke-width="0.8"/>
+    <rect x="100" y="52" width="220" height="24" fill="#0d2038" stroke="#1e4060" stroke-width="0.8" rx="1"/>
+    <rect x="120" y="40" width="80" height="14" fill="#0a1830" stroke="#1a3050" stroke-width="0.7" rx="1"/>
+    <rect x="215" y="43" width="60" height="11" fill="#0a1830" stroke="#1a3050" stroke-width="0.7" rx="1"/>
+    <rect x="155" y="16" width="18" height="28" fill="#0d1e3a" stroke="#1e3860" stroke-width="0.8" rx="1"/>
+    <rect x="185" y="18" width="18" height="26" fill="#0d1e3a" stroke="#1e3860" stroke-width="0.8" rx="1"/>
+    <rect x="215" y="20" width="18" height="24" fill="#0d1e3a" stroke="#1e3860" stroke-width="0.8" rx="1"/>
+    <rect x="245" y="22" width="14" height="22" fill="#0d1e3a" stroke="#1e3860" stroke-width="0.8" rx="1"/>
+    <rect x="153" y="12" width="22" height="6" fill="#060e1a" rx="1"/>
+    <rect x="183" y="14" width="22" height="6" fill="#060e1a" rx="1"/>
+    <rect x="213" y="16" width="22" height="6" fill="#060e1a" rx="1"/>
+    <rect x="243" y="18" width="18" height="6" fill="#060e1a" rx="1"/>
+    <path d="M162,12 Q158,4 164,0" stroke="rgba(150,180,220,0.2)" stroke-width="2" fill="none"/>
+    <path d="M193,14 Q190,5 196,1" stroke="rgba(150,180,220,0.15)" stroke-width="2" fill="none"/>
+    <line x1="340" y1="75" x2="335" y2="20" stroke="#1e4060" stroke-width="1.5"/>
+    <line x1="80" y1="76" x2="75" y2="30" stroke="#1e4060" stroke-width="1.2"/>
+    <line x1="100" y1="52" x2="320" y2="51" stroke="#1e4060" stroke-width="0.6"/>
+    <circle cx="60" cy="82" r="2" fill="#0d3060" stroke="#1e5090" stroke-width="0.5"/>
+    <circle cx="80" cy="81" r="2" fill="#0d3060" stroke="#1e5090" stroke-width="0.5"/>
+    <circle cx="340" cy="80" r="2" fill="#0d3060" stroke="#1e5090" stroke-width="0.5"/>
+    <circle cx="360" cy="80" r="2" fill="#0d3060" stroke="#1e5090" stroke-width="0.5"/>
+    <rect x="125" y="56" width="5" height="4" fill="rgba(255,230,100,0.3)" rx="0.5"/>
+    <rect x="135" y="56" width="5" height="4" fill="rgba(255,230,100,0.25)" rx="0.5"/>
+    <rect x="145" y="56" width="5" height="4" fill="rgba(255,230,100,0.3)" rx="0.5"/>
+    <rect x="200" y="55" width="5" height="4" fill="rgba(255,230,100,0.2)" rx="0.5"/>
+    <rect x="250" y="56" width="5" height="4" fill="rgba(255,230,100,0.25)" rx="0.5"/>
+    <rect x="280" y="56" width="5" height="4" fill="rgba(255,230,100,0.2)" rx="0.5"/>
+    <path d="M15,95 Q210,90 405,93" stroke="rgba(0,120,200,0.3)" stroke-width="1" fill="none"/>
+  </svg>
+  <div class="titanic-ocean">
+    <div class="moon-reflection"></div>
+    <div class="ocean-wave" style="--wd:7s;--wdel:0s;top:5px;opacity:0.8"></div>
+    <div class="ocean-wave" style="--wd:5s;--wdel:1.5s;top:15px;opacity:0.5"></div>
+    <div class="ocean-wave" style="--wd:9s;--wdel:3s;top:28px;opacity:0.4"></div>
+  </div>
+  <div class="login-box">
+    <div class="bolt bolt-tl"></div>
+    <div class="bolt bolt-tr"></div>
+    <div class="login-header">
+      <span class="login-ship-icon">🚢</span>
+      <div class="login-brand">R.E.A.C.T.</div>
+      <div class="login-tagline">Resilient Engine for Adaptive Cargo & Transport</div>
+      <div class="login-titanic-label">Operations Bridge · India HQ</div>
+    </div>
+    <div class="login-form">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">👤</span>
+          <input class="form-input" id="login-user" type="text" placeholder="Enter your username" value="captain.india"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Access Code</label>
+        <div class="form-input-wrap">
+          <span class="form-input-icon">🔐</span>
+          <input class="form-input" id="login-pass" type="password" placeholder="Enter access code" value="guardian2024"/>
+        </div>
+      </div>
+      <button class="login-btn" onclick="doLogin()">⚓ &nbsp; Board the Bridge</button>
+      <div class="login-divider">quick access</div>
+      <div class="demo-accounts">
+        <div class="demo-account" onclick="quickLogin('captain.india','guardian2024','Fleet Commander')">
+          <span>🚢 <span class="da-name">captain.india</span></span>
+          <span class="da-role">Fleet Commander</span>
+          <span class="da-use">Use</span>
+        </div>
+        <div class="demo-account" onclick="quickLogin('route.analyst','route123','Route Analyst')">
+          <span>🧭 <span class="da-name">route.analyst</span></span>
+          <span class="da-role">Route Analyst</span>
+          <span class="da-use">Use</span>
+        </div>
+        <div class="demo-account" onclick="quickLogin('ops.director','ops2024','Operations Director')">
+          <span>📊 <span class="da-name">ops.director</span></span>
+          <span class="da-role">Operations Director</span>
+          <span class="da-use">Use</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WELCOME SPLASH -->
+<div id="welcome-screen">
+  <div class="stars-canvas" id="welcome-stars"></div>
+  <div class="welcome-ocean">
+    <div class="welcome-wave welcome-wave1"></div>
+    <div class="welcome-wave welcome-wave2"></div>
+  </div>
+  <div class="welcome-content">
+    <span class="welcome-ship">🚢</span>
+    <div class="welcome-title">Welcome Aboard</div>
+    <div class="welcome-subtitle">R.E.A.C.T. — India Operations Platform</div>
+    <div class="welcome-user-msg" id="welcome-user-msg">Hello, Captain!</div>
+    <div class="welcome-stats">
+      <div class="welcome-stat"><div class="ws-val">8</div><div class="ws-lbl">Active Shipments</div></div>
+      <div class="welcome-stat"><div class="ws-val">14</div><div class="ws-lbl">Fleet Assets</div></div>
+      <div class="welcome-stat"><div class="ws-val">5</div><div class="ws-lbl">Indian Ports</div></div>
+      <div class="welcome-stat"><div class="ws-val">5</div><div class="ws-lbl">Sensor Feeds</div></div>
+    </div>
+    <button class="welcome-enter-btn" onclick="enterApp()">⚓ &nbsp; Enter Operations Bridge</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">🚢</div>
+      <div>
+        <div class="topbar-name">R.E.A.C.T.</div>
+        <div class="topbar-sub">Resilient Engine for Adaptive Cargo & Transport</div>
+      </div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-badge" id="topbar-disruption">🔴 Active: Suez Canal</div>
+    <div class="topbar-time" id="topbar-time">00:00:00</div>
+    <div class="topbar-user">
+      <div class="topbar-avatar" id="topbar-avatar">C</div>
+      <div class="topbar-username" id="topbar-username">captain.india</div>
+    </div>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">
+      <span id="theme-icon">☀️</span>
+      <span id="theme-label">Light</span>
+      <div class="tt-track"><div class="tt-thumb"></div></div>
+    </button>
+    <button class="topbar-logout" onclick="doLogout()">⎋ Logout</button>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="nav-section-label">Navigation</div>
+      <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span><span class="nav-label">Operations Dashboard</span>
+        <span class="nav-badge green" id="nav-badge-dash">Live</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('map')" id="nav-map">
+        <span class="nav-icon">🗺️</span><span class="nav-label">Live Route Map</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('disruption')" id="nav-disruption">
+        <span class="nav-icon">🚨</span><span class="nav-label">Disruption Monitor</span>
+        <span class="nav-badge red" id="nav-badge-dis">5</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('routes')" id="nav-routes">
+        <span class="nav-icon">🧭</span><span class="nav-label">Route Optimizer</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('fleet')" id="nav-fleet">
+        <span class="nav-icon">🚚</span><span class="nav-label">Fleet Optimizer</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('coldchain')" id="nav-coldchain">
+        <span class="nav-icon">❄️</span><span class="nav-label">Cold-Chain Monitor</span>
+        <span class="nav-badge red">4</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('about')" id="nav-about">
+        <span class="nav-icon">🏢</span><span class="nav-label">About Us</span>
+      </button>
+      <hr class="sidebar-divider"/>
+      <div class="nav-section-label">Active Disruption</div>
+      <div class="disruption-widget">
+        <div class="dw-title">⚠ Disruption Zone</div>
+        <div class="dw-loc" id="sidebar-loc">Suez Canal</div>
+        <div class="dw-reason" id="sidebar-reason">Geopolitical conflict — Route blocked</div>
+      </div>
+    </nav>
+
+    <main class="content">
+
+      <!-- PAGE: DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Dashboard</div>
+          <div class="page-title"><div class="page-title-icon">📊</div>Operations Dashboard</div>
+          <div class="page-subtitle">Real-time India fleet intelligence — live disruption monitoring across JNPT, Chennai, Cochin, Mundra, Kolkata</div>
+        </div>
+        <div class="disruption-selector">
+          <label>🔴 Active disruption:</label>
+          <select id="disruption-select" onchange="applyDisruption()">
+            <option value="Suez Canal">Suez Canal</option>
+            <option value="Strait of Malacca">Strait of Malacca</option>
+            <option value="Pacific Ocean">Pacific Ocean</option>
+            <option value="Atlantic Ocean">Atlantic Ocean</option>
+          </select>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-card mc-gold">
+            <div class="mc-icon">⚠️</div>
+            <div class="mc-label">Affected Shipments</div>
+            <div class="mc-value" id="m-affected">—</div>
+            <div class="mc-delta">Via disrupted route</div>
+            <div class="mc-deco">🚢</div>
+          </div>
+          <div class="metric-card mc-blue">
+            <div class="mc-icon">🚚</div>
+            <div class="mc-label">Idle Fleet Assets</div>
+            <div class="mc-value" id="m-idle">—</div>
+            <div class="mc-delta">Ready for deployment</div>
+            <div class="mc-deco">🚛</div>
+          </div>
+          <div class="metric-card mc-red">
+            <div class="mc-icon">❄️</div>
+            <div class="mc-label">Cold-Chain Alerts</div>
+            <div class="mc-value" id="m-alerts">—</div>
+            <div class="mc-delta">Excursions detected</div>
+            <div class="mc-deco">🌡️</div>
+          </div>
+          <div class="metric-card mc-green">
+            <div class="mc-icon">✅</div>
+            <div class="mc-label">Safe Shipments</div>
+            <div class="mc-value" id="m-safe">—</div>
+            <div class="mc-delta">Unaffected routes</div>
+            <div class="mc-deco">⚓</div>
+          </div>
+        </div>
+        <div id="severity-block"></div>
+        <div class="cargo-priority-section">
+          <div class="section-heading">
+            <div class="section-heading-icon">🚨</div>
+            Cargo Rerouting Priority — Who Needs Alternative Route First?
+            <span style="margin-left:auto;font-size:0.68rem;color:var(--text3);font-weight:400">Sorted by cargo urgency</span>
+          </div>
+          <div id="cargo-priority-grid" class="cargo-priority-grid"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="ch-icon">🗂</div>Action Table — Affected Shipments & Recommendations</div>
+          <div class="card-body">
+            <table>
+              <thead><tr><th>Shipment</th><th>Cargo</th><th>Type</th><th>Recommended Action</th><th>Fleet Available</th><th>Status</th></tr></thead>
+              <tbody id="action-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="ch-icon">❄️</div>Cold-Chain Alerts</div>
+          <div class="card-body">
+            <table>
+              <thead><tr><th>Shipment</th><th>Cargo</th><th>Status</th><th>Temperature</th><th>Safe Range</th></tr></thead>
+              <tbody id="cold-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="ch-icon">🎯</div>Priority Actions</div>
+          <div class="card-body" id="next-actions-body"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: MAP -->
+      <div class="page" id="page-map">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Route Map</div>
+          <div class="page-title"><div class="page-title-icon">🗺️</div>Live Route Map</div>
+          <div class="page-subtitle">Real-time map — India shipping lanes, truck depot routes, disruption zones &amp; alternative paths</div>
+        </div>
+        <div class="map-container">
+          <div class="map-header">
+            <span>🌍</span>
+            <span class="map-header-title">Live Operations Map — Global Shipping + India Truck Network</span>
+            <span class="map-header-sub" id="map-header-sub">All shipments &amp; truck depot routes shown</span>
+          </div>
+          <div class="map-route-selector">
+            <label>📦 Shipment filter:</label>
+            <select id="map-shipment-select" onchange="renderMapPage()">
+              <option value="">— All shipments —</option>
+              <optgroup label="🚢 Sea Shipments" id="optgroup-shipments"></optgroup>
+              <optgroup label="🚚 Truck Routes" id="optgroup-trucks"></optgroup>
+            </select>
+            <label style="margin-left:12px">🔴 Active disruption:</label>
+            <select id="map-select" onchange="renderMapPage()">
+              <option value="Suez Canal">Suez Canal</option>
+              <option value="Strait of Malacca">Strait of Malacca</option>
+              <option value="Pacific Ocean">Pacific Ocean</option>
+              <option value="Atlantic Ocean">Atlantic Ocean</option>
+            </select>
+          </div>
+          <div class="map-layer-controls">
+            <span style="font-size:0.73rem;font-weight:700;color:var(--text2);align-self:center">Layers:</span>
+            <button class="layer-toggle on" id="layer-shipping" onclick="handleLayerToggle('shipping',this)">🚢 Shipping Routes</button>
+            <button class="layer-toggle on" id="layer-truck" onclick="handleLayerToggle('truck',this)">🚚 Truck Routes</button>
+            <button class="layer-toggle on" id="layer-disruption" onclick="handleLayerToggle('disruption',this)">🔴 Disruption Zone</button>
+            <button class="layer-toggle on" id="layer-ports" onclick="handleLayerToggle('ports',this)">⚓ Ports &amp; Depots</button>
+            <button class="layer-toggle on" id="layer-alt" onclick="handleLayerToggle('alt',this)">🟢 Alt Routes</button>
+          </div>
+          <div id="leaflet-map"></div>
+          <div class="map-legend">
+            <div class="legend-item"><div class="legend-line" style="background:#f43f5e"></div>Disrupted Sea Route</div>
+            <div class="legend-item"><div class="legend-line" style="background:#10b981"></div>Alternative Sea Route</div>
+            <div class="legend-item"><div class="legend-line" style="background:#38bdf8"></div>Safe Sea Route</div>
+            <div class="legend-item"><div class="legend-line" style="background:#f59e0b;border-top:3px dashed #f59e0b;height:0;margin-top:2px"></div>Truck Route</div>
+            <div class="legend-item"><div class="map-pin-port" style="display:inline-block"></div>&nbsp;Indian Port</div>
+            <div class="legend-item"><div class="map-pin-depot" style="display:inline-block"></div>&nbsp;Truck Depot</div>
+            <div class="legend-item"><span style="color:#f43f5e;font-size:0.9rem">⊗</span>&nbsp;Disruption Zone</div>
+          </div>
+        </div>
+        <div id="map-route-details"></div>
+      </div>
+
+      <!-- PAGE: DISRUPTION -->
+      <div class="page" id="page-disruption">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Disruption Monitor</div>
+          <div class="page-title"><div class="page-title-icon">🚨</div>Disruption Monitor</div>
+          <div class="page-subtitle">All India shipments — affected vs safe based on active disruption zone</div>
+        </div>
+        <div class="disruption-selector">
+          <label>Disruption at:</label>
+          <select id="dis-select2" onchange="renderDisruptionPage()">
+            <option value="Suez Canal">Suez Canal</option>
+            <option value="Strait of Malacca">Strait of Malacca</option>
+            <option value="Pacific Ocean">Pacific Ocean</option>
+            <option value="Atlantic Ocean">Atlantic Ocean</option>
+          </select>
+        </div>
+        <div class="filter-bar" id="dis-filter-bar">
+          <button class="filter-btn active" onclick="filterDis('all',this)">All Shipments</button>
+          <button class="filter-btn" onclick="filterDis('affected',this)">⚠️ Affected</button>
+          <button class="filter-btn" onclick="filterDis('safe',this)">✅ Safe</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table>
+              <thead><tr><th>ID</th><th>Origin → Destination</th><th>Route</th><th>Cargo</th><th>Type</th><th>Status</th><th>Disrupted?</th></tr></thead>
+              <tbody id="dis-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: ROUTES -->
+      <div class="page" id="page-routes">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Route Optimizer</div>
+          <div class="page-title"><div class="page-title-icon">🧭</div>Route Optimizer</div>
+          <div class="page-subtitle">Cargo-aware alternative route recommendations for affected India shipments</div>
+        </div>
+        <div class="disruption-selector">
+          <label>Disruption at:</label>
+          <select id="route-select" onchange="renderRoutesPage()">
+            <option value="Suez Canal">Suez Canal</option>
+            <option value="Strait of Malacca">Strait of Malacca</option>
+            <option value="Pacific Ocean">Pacific Ocean</option>
+            <option value="Atlantic Ocean">Atlantic Ocean</option>
+          </select>
+        </div>
+        <div id="route-cards"></div>
+      </div>
+
+      <!-- PAGE: FLEET -->
+      <div class="page" id="page-fleet">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Fleet Optimizer</div>
+          <div class="page-title"><div class="page-title-icon">🚚</div>Fleet Optimizer</div>
+          <div class="page-subtitle">India fleet assets — trucks at depots, vessels at Indian ports</div>
+        </div>
+        <div class="filter-bar" id="fleet-filter-bar">
+          <button class="filter-btn active" onclick="filterFleet('all',this)">All Assets</button>
+          <button class="filter-btn" onclick="filterFleet('Idle',this)">🟢 Idle</button>
+          <button class="filter-btn" onclick="filterFleet('In Use',this)">🔵 In Use</button>
+          <button class="filter-btn" onclick="filterFleet('Truck',this)">🚚 Trucks</button>
+          <button class="filter-btn" onclick="filterFleet('Container',this)">📦 Containers</button>
+          <button class="filter-btn" onclick="filterFleet('Vessel',this)">🚢 Vessels</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table>
+              <thead><tr><th>ID</th><th>Type</th><th>Location</th><th>Capacity</th><th>Suitable For</th><th>Status</th></tr></thead>
+              <tbody id="fleet-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: COLD-CHAIN -->
+      <div class="page" id="page-coldchain">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> Cold-Chain Monitor</div>
+          <div class="page-title"><div class="page-title-icon">❄️</div>Cold-Chain Monitor</div>
+          <div class="page-subtitle">Temperature sensor readings — excursion detection for sensitive cargo</div>
+        </div>
+        <div class="filter-bar" id="cold-filter-bar">
+          <button class="filter-btn active" onclick="filterCold('all',this)">All</button>
+          <button class="filter-btn" onclick="filterCold('CRITICAL',this)">🔴 Critical</button>
+          <button class="filter-btn" onclick="filterCold('WARNING',this)">⚠️ Warning</button>
+          <button class="filter-btn" onclick="filterCold('NORMAL',this)">✅ Normal</button>
+        </div>
+        <div id="cold-shipment-cards"></div>
+      </div>
+
+      <!-- PAGE: ABOUT US -->
+      <div class="page" id="page-about">
+        <div class="page-header">
+          <div class="page-breadcrumb">Operations Bridge <span>›</span> About Us</div>
+          <div class="page-title"><div class="page-title-icon">🏢</div>About Us</div>
+          <div class="page-subtitle">Meet the team behind R.E.A.C.T. — India Fleet &amp; Disruption Intelligence Platform</div>
+        </div>
+
+        <!-- Company Banner -->
+        <div class="about-company-banner">
+          <div class="about-company-logo">⚓</div>
+          <div class="about-company-info">
+            <div class="about-company-name">R.E.A.C.T.</div>
+            <div class="about-company-fullform">Resilient Engine for Adaptive Cargo &amp; Transport</div>
+            <div class="about-team-name-pill">⚡ Team: FRONTIERS</div>
+            <div class="about-company-desc">
+              FRONTIERS is a team building intelligent solutions for resilient logistics. Through R.E.A.C.T.R., we help identify disruption impact, recommend adaptive transport decisions, optimize fleet utilization, and protect sensitive cargo.
+            </div>
+          </div>
+        </div>
+
+        <!-- Greeting & Contact -->
+        <div class="about-greeting-bar">
+          <div class="about-greeting-left">
+            <span class="about-greeting-wave">👋</span>
+            <div>
+              <div class="about-greeting-text">Hello from Team <strong>FRONTIERS</strong>! We're glad you're here.</div>
+              <div class="about-greeting-sub">We built R.E.A.C.T. to make India's supply-chain resilient, adaptive, and intelligent.</div>
+            </div>
+          </div>
+          <div class="about-contact-pill">
+            <span>📞</span>
+            <span class="about-contact-label">Contact Us</span>
+            <a class="about-contact-num" href="tel:8200821204">+91 82008 21204</a>
+          </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="section-heading" style="margin-top:28px;">
+          <div class="section-heading-icon">👥</div>
+          Team FRONTIERS
+        </div>
+        <div class="about-team-grid">
+
+          <div class="about-member-card">
+            <div class="about-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">TM</div>
+            <div class="about-member-num">01</div>
+            <div class="about-member-name">Tirth Makavana</div>
+            <div class="about-member-role">Lead Developer &amp; Systems Architect</div>
+            <div class="about-member-bio">Drives the core platform architecture, backend APIs, and real-time data pipelines powering R.E.A.C.T.'s disruption intelligence engine.</div>
+            <div class="about-member-skills">
+              <span class="about-skill">Architecture</span>
+              <span class="about-skill">Backend</span>
+              <span class="about-skill">Data Pipelines</span>
+            </div>
+          </div>
+
+          <div class="about-member-card">
+            <div class="about-avatar" style="background:linear-gradient(135deg,#f43f5e,#fb7185)">JK</div>
+            <div class="about-member-num">02</div>
+            <div class="about-member-name">Jaini Khandhar</div>
+            <div class="about-member-role">UI/UX Designer &amp; Frontend Lead</div>
+            <div class="about-member-bio">Crafts the intuitive dashboard experience — turning complex logistics data into clear, actionable visual intelligence for operations teams.</div>
+            <div class="about-member-skills">
+              <span class="about-skill">UI/UX</span>
+              <span class="about-skill">Frontend</span>
+              <span class="about-skill">Data Viz</span>
+            </div>
+          </div>
+
+          <div class="about-member-card">
+            <div class="about-avatar" style="background:linear-gradient(135deg,#10b981,#14b8a6)">KP</div>
+            <div class="about-member-num">03</div>
+            <div class="about-member-name">Kunj Patel</div>
+            <div class="about-member-role">Supply Chain Analyst &amp; AI Engineer</div>
+            <div class="about-member-bio">Designs intelligent route optimization algorithms and cargo priority scoring systems that keep India's fleet moving efficiently under disruption.</div>
+            <div class="about-member-skills">
+              <span class="about-skill">AI/ML</span>
+              <span class="about-skill">Route Optimization</span>
+              <span class="about-skill">Analytics</span>
+            </div>
+          </div>
+
+          <div class="about-member-card">
+            <div class="about-avatar" style="background:linear-gradient(135deg,#f59e0b,#fb7185)">MR</div>
+            <div class="about-member-num">04</div>
+            <div class="about-member-name">Mihir Rana</div>
+            <div class="about-member-role">Cold-Chain &amp; IoT Specialist</div>
+            <div class="about-member-bio">Manages sensor integrations, temperature excursion detection, and cold-chain compliance monitoring for pharmaceutical and perishable cargo.</div>
+            <div class="about-member-skills">
+              <span class="about-skill">IoT Sensors</span>
+              <span class="about-skill">Cold-Chain</span>
+              <span class="about-skill">Compliance</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="about-footer-note">
+          <span>🚢</span> Built with precision by Team <strong>FRONTIERS</strong> for India's maritime and logistics industry.
+          &nbsp;|&nbsp; 📞 <a href="tel:8200821204" style="color:var(--indigo);text-decoration:none;font-weight:700">+91 82008 21204</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CHATBOX FAB -->
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()">
+  🤖<span class="cf-notif">3</span>
+</button>
+<div class="chat-panel hidden" id="chat-panel">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-title-wrap">
+      <div class="chat-title">Guardian AI</div>
+      <div class="chat-status">Online — India Ops</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-msg bot">
+      👋 Namaste! I'm Guardian AI. Ask me about India shipments, fleet at JNPT/Chennai/Cochin, disruptions, alternative routes, or cold-chain status.
+    </div>
+  </div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <span class="chat-chip" onclick="sendChatChip(this)">Affected shipments?</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">Idle vessels</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">Alternative routes</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">Cold chain alerts</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">Fleet summary</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">India ports status</span>
+    <span class="chat-chip" onclick="sendChatChip(this)">Dashboard summary</span>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" type="text" placeholder="Ask about India fleet, routes, cargo…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script>
+
+// ── THEME TOGGLE ──────────────────────────────────────────────
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if(isDark){
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('theme-icon').textContent = '☀️';
+    document.getElementById('theme-label').textContent = 'Light';
+  } else {
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('theme-icon').textContent = '🌙';
+    document.getElementById('theme-label').textContent = 'Dark';
+  }
+}
+
+// ── INDIA-CENTRIC SHIPMENT DATA ─────────────────────────────
+const SHIPMENTS = [
+  { id:"SHP-001", origin:"JNPT Mumbai",  destination:"Rotterdam",  route:"Suez Canal",        cargo:"Textiles",         cargo_type:"general",    status:"In Transit", lat_o:18.95, lon_o:72.95, lat_d:51.9,  lon_d:4.5   },
+  { id:"SHP-002", origin:"Chennai Port", destination:"Singapore",  route:"Strait of Malacca", cargo:"Auto Parts",       cargo_type:"heavy",      status:"In Transit", lat_o:13.1,  lon_o:80.3,  lat_d:1.3,   lon_d:103.8 },
+  { id:"SHP-003", origin:"Kolkata Port", destination:"Tokyo",      route:"Strait of Malacca", cargo:"Steel",            cargo_type:"heavy",      status:"In Transit", lat_o:22.5,  lon_o:88.3,  lat_d:35.7,  lon_d:139.7 },
+  { id:"SHP-004", origin:"JNPT Mumbai",  destination:"New York",   route:"Suez Canal",        cargo:"Vaccines",         cargo_type:"perishable", status:"In Transit", lat_o:18.95, lon_o:72.95, lat_d:40.7,  lon_d:-74.0 },
+  { id:"SHP-005", origin:"Cochin Port",  destination:"Dubai",      route:"Arabian Sea",       cargo:"Spices",           cargo_type:"perishable", status:"In Transit", lat_o:9.97,  lon_o:76.27, lat_d:25.2,  lon_d:55.3  },
+  { id:"SHP-006", origin:"Mundra Port",  destination:"Cape Town",  route:"Atlantic Ocean",    cargo:"Chemicals",        cargo_type:"hazardous",  status:"In Transit", lat_o:22.84, lon_o:69.7,  lat_d:-33.9, lon_d:18.4  },
+  { id:"SHP-007", origin:"Chennai Port", destination:"London",     route:"Suez Canal",        cargo:"Electronics",      cargo_type:"general",    status:"Pending",    lat_o:13.1,  lon_o:80.3,  lat_d:51.5,  lon_d:-0.1  },
+  { id:"SHP-008", origin:"JNPT Mumbai",  destination:"Sydney",     route:"Pacific Ocean",     cargo:"Machinery",        cargo_type:"heavy",      status:"In Transit", lat_o:18.95, lon_o:72.95, lat_d:-33.8, lon_d:151.2 },
+];
+
+const ALTERNATIVE_ROUTES = {
+  "Suez Canal":        { all:["Cape of Good Hope route (+7-10 days, fully open)","Trans-Siberian rail (+14 days, land only)"], perishable:["Air freight via Dubai Hub (fastest, premium cost)"], hazardous:["Cape of Good Hope — certified hazmat vessels"] },
+  "Strait of Malacca": { all:["Lombok Strait (+1-2 days, open to all vessels)","Sunda Strait (shorter, smaller vessels only)"], perishable:["Air freight via Singapore Changi"], hazardous:["Lombok Strait — hazmat-cleared corridor"] },
+  "Pacific Ocean":     { all:["Panama Canal route (+3-5 days)","Arctic Northern Sea Route (seasonal)"], perishable:["Air freight via LAX or Sydney"], hazardous:["Panama Canal — hazmat docs required"] },
+  "Atlantic Ocean":    { all:["Cape Horn route (bulk & heavy cargo)"], perishable:["Air freight via JFK or Dubai"], hazardous:["Cape Horn — consult port authority"] },
+  "Arabian Sea":       { all:["Red Sea via Hormuz (standard)","Air freight from Cochin"], perishable:["Air freight — Cochin Airport to DXB (fastest)"], hazardous:["Standard Arabian Sea — all vessels cleared"] },
+};
+
+const FLEET_ASSETS = [
+  { id:"TRK-001", type:"Truck", location:"Mumbai Depot (JNPT)",       status:"Idle",   capacity_tons:20,   suitable_for:["general","perishable"] },
+  { id:"TRK-002", type:"Truck", location:"Delhi NCR Warehouse",        status:"In Use", capacity_tons:20,   suitable_for:["general","perishable"] },
+  { id:"TRK-003", type:"Truck", location:"Chennai Logistics Park",     status:"Idle",   capacity_tons:30,   suitable_for:["general","heavy"] },
+  { id:"TRK-004", type:"Truck", location:"Kolkata Freight Hub",        status:"In Use", capacity_tons:15,   suitable_for:["general"] },
+  { id:"TRK-005", type:"Truck", location:"Pune Distribution Centre",   status:"Idle",   capacity_tons:18,   suitable_for:["general","perishable"] },
+  { id:"TRK-006", type:"Truck", location:"Ahmedabad ICD",              status:"Idle",   capacity_tons:25,   suitable_for:["general","heavy"] },
+  { id:"CON-001", type:"Container", location:"JNPT Mumbai Terminal",   status:"Idle",   capacity_tons:25,   suitable_for:["general","heavy"] },
+  { id:"CON-002", type:"Container", location:"Chennai Port Terminal",  status:"In Use", capacity_tons:25,   suitable_for:["general","heavy"] },
+  { id:"CON-003", type:"Container", location:"Mundra Port Freezone",   status:"Idle",   capacity_tons:20,   suitable_for:["general","perishable"] },
+  { id:"VSL-001", type:"Vessel", location:"JNPT Mumbai Anchorage",     status:"Idle",   capacity_tons:8000, suitable_for:["general","heavy","perishable"] },
+  { id:"VSL-002", type:"Vessel", location:"Chennai Port Anchorage",    status:"In Use", capacity_tons:6000, suitable_for:["general","heavy"] },
+  { id:"VSL-003", type:"Vessel", location:"Cochin Port Anchorage",     status:"Idle",   capacity_tons:5000, suitable_for:["general","perishable","hazardous"] },
+  { id:"VSL-004", type:"Vessel", location:"Kolkata/Haldia Port",       status:"In Use", capacity_tons:4500, suitable_for:["general","heavy"] },
+  { id:"VSL-005", type:"Vessel", location:"Mundra Port Anchorage",     status:"Idle",   capacity_tons:9000, suitable_for:["general","heavy","hazardous"] },
+];
+
+const SENSOR_READINGS = [
+  { shipment_id:"SHP-101", cargo:"Vaccines",             temperature:5.2,  timestamp:"2026-09-13 08:00", temp_min:2,  temp_max:8   },
+  { shipment_id:"SHP-101", cargo:"Vaccines",             temperature:9.8,  timestamp:"2026-09-13 10:30", temp_min:2,  temp_max:8   },
+  { shipment_id:"SHP-101", cargo:"Vaccines",             temperature:14.5, timestamp:"2026-09-13 12:00", temp_min:2,  temp_max:8   },
+  { shipment_id:"SHP-102", cargo:"Frozen Seafood",       temperature:-18.0,timestamp:"2026-09-13 07:00", temp_min:-25,temp_max:-15 },
+  { shipment_id:"SHP-102", cargo:"Frozen Seafood",       temperature:-13.5,timestamp:"2026-09-13 09:45", temp_min:-25,temp_max:-15 },
+  { shipment_id:"SHP-103", cargo:"Fresh Produce",        temperature:4.1,  timestamp:"2026-09-13 06:30", temp_min:2,  temp_max:6   },
+  { shipment_id:"SHP-103", cargo:"Fresh Produce",        temperature:1.0,  timestamp:"2026-09-13 11:00", temp_min:2,  temp_max:6   },
+  { shipment_id:"SHP-104", cargo:"Industrial Chemicals", temperature:20.0, timestamp:"2026-09-13 08:15", temp_min:15, temp_max:25  },
+  { shipment_id:"SHP-104", cargo:"Industrial Chemicals", temperature:30.5, timestamp:"2026-09-13 13:00", temp_min:15, temp_max:25  },
+  { shipment_id:"SHP-104", cargo:"Industrial Chemicals", temperature:42.0, timestamp:"2026-09-13 15:30", temp_min:15, temp_max:25  },
+  { shipment_id:"SHP-105", cargo:"Blood Samples",        temperature:3.5,  timestamp:"2026-09-13 09:00", temp_min:2,  temp_max:6   },
+  { shipment_id:"SHP-105", cargo:"Blood Samples",        temperature:5.9,  timestamp:"2026-09-13 11:30", temp_min:2,  temp_max:6   },
+];
+
+// Alternative waypoints for map display [lat, lon]
+const ALT_WAYPOINTS_LATLON = {
+  "Suez Canal":        [[-34.4, 18.5]],   // Cape of Good Hope
+  "Strait of Malacca": [[-8.5,  115.7]],  // Lombok Strait
+  "Pacific Ocean":     [[9.0,  -79.9]],   // Panama Canal
+  "Atlantic Ocean":    [[-55.9,-67.3]],   // Cape Horn
+  "Arabian Sea":       [[25.0,  55.0]],   // Dubai direct
+};
+
+const ALT_WAYPOINT_NAMES = {
+  "Suez Canal":"Cape of Good Hope", "Strait of Malacca":"Lombok Strait",
+  "Pacific Ocean":"Panama Canal", "Atlantic Ocean":"Cape Horn", "Arabian Sea":"Dubai Direct",
+};
+
+// Disruption zone coords [lat, lon, radiusKm]
+const DISRUPTION_ZONES_LATLON = {
+  "Suez Canal":        [30.5, 32.5, 200, "Suez Canal"],
+  "Strait of Malacca": [2.5, 101.5, 140, "Str. Malacca"],
+  "Pacific Ocean":     [20.0,-160.0, 800, "Pacific"],
+  "Atlantic Ocean":    [30.0, -40.0, 700, "Atlantic"],
+  "Arabian Sea":       [15.0,  65.0, 300, "Arabian Sea"],
+};
+
+// ── LOGIC ────────────────────────────────────────────────────
+const WARNING_MARGIN = 3.0;
+function detectAffected(loc){
+  const a=[],s=[];
+  SHIPMENTS.forEach(sh=>(sh.route.toLowerCase().includes(loc.toLowerCase().split(' ')[0])?a:s).push({...sh}));
+  return {affected:a,safe:s};
+}
+function recommendRoutes(aff,loc){
+  const opts=ALTERNATIVE_ROUTES[loc]||ALTERNATIVE_ROUTES["Suez Canal"];
+  return aff.map(s=>{
+    let alts=[];
+    if(opts){ if(opts[s.cargo_type]) alts=opts[s.cargo_type].map(a=>({text:a,tag:'best'})); alts=alts.concat((opts.all||[]).map(a=>({text:a,tag:'general'}))); }
+    else alts=[{text:'Manual review required',tag:'general'}];
+    return {...s,alternatives:alts};
+  });
+}
+function findIdle(){ return FLEET_ASSETS.filter(a=>a.status==='Idle'); }
+function matchAssets(idle,aff){ const r={}; aff.forEach(s=>{ r[s.id]=idle.filter(a=>a.suitable_for.includes(s.cargo_type)); }); return r; }
+function classifyReading(r){
+  let breach=0,dir='OK';
+  if(r.temperature<r.temp_min){breach=r.temp_min-r.temperature;dir='TOO LOW';}
+  else if(r.temperature>r.temp_max){breach=r.temperature-r.temp_max;dir='TOO HIGH';}
+  let status='NORMAL';
+  if(breach>WARNING_MARGIN)status='CRITICAL';
+  else if(breach>0)status='WARNING';
+  return{...r,breach,dir,status};
+}
+function analyseReadings(){
+  const g={};
+  SENSOR_READINGS.forEach(r=>{ const c=classifyReading(r); if(!g[c.shipment_id])g[c.shipment_id]=[]; g[c.shipment_id].push(c); });
+  return g;
+}
+function getWorst(g){
+  const P={NORMAL:0,WARNING:1,CRITICAL:2};
+  return Object.entries(g).map(([,rs])=>rs.reduce((a,b)=>P[b.status]>P[a.status]?b:a)).filter(r=>r.status!=='NORMAL').sort((a,b)=>P[b.status]-P[a.status]);
+}
+function getSeverity(n){ return n===0?{label:'LOW',cls:'low'}:n<=2?{label:'MEDIUM',cls:'medium'}:{label:'HIGH',cls:'high'}; }
+
+// ── BADGES / HELPERS ─────────────────────────────────────────
+function ctBadge(t){ const m={general:'badge-gray',perishable:'badge-blue',hazardous:'badge-orange',heavy:'badge-yellow'}; return `<span class="badge ${m[t]||'badge-gray'}">${t}</span>`; }
+function sBadge(s){ const m={'Idle':'badge-green','In Use':'badge-blue','In Transit':'badge-purple','Pending':'badge-gray','Delayed':'badge-red'}; return `<span class="badge ${m[s]||'badge-gray'}">${s}</span>`; }
+function tBadge(s){ if(s==='CRITICAL')return'<span class="badge badge-red">🔴 CRITICAL</span>'; if(s==='WARNING')return'<span class="badge badge-yellow">⚠️ WARNING</span>'; return'<span class="badge badge-green">✅ NORMAL</span>'; }
+function aIcon(t){ return t==='Truck'?'🚚':t==='Container'?'📦':'🚢'; }
+
+// ── CURRENT STATE ─────────────────────────────────────────────
+let currentDisruption = 'Suez Canal';
+function syncSelects(loc){
+  ['disruption-select','dis-select2','route-select','map-select'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=loc; });
+  const sl=document.getElementById('sidebar-loc'); if(sl)sl.textContent=loc;
+  const tb=document.getElementById('topbar-disruption'); if(tb)tb.textContent=`🔴 Active: ${loc}`;
+  currentDisruption = loc;
+}
+function applyDisruption(){ syncSelects(document.getElementById('disruption-select').value); renderDashboard(); }
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDashboard(){
+  const {affected,safe}=detectAffected(currentDisruption);
+  const enriched=recommendRoutes(affected,currentDisruption);
+  const idle=findIdle(); const matches=matchAssets(idle,enriched);
+  const grouped=analyseReadings(); const alerts=getWorst(grouped);
+  const sev=getSeverity(affected.length);
+
+  document.getElementById('m-affected').textContent=affected.length;
+  document.getElementById('m-idle').textContent=idle.length;
+  document.getElementById('m-alerts').textContent=alerts.length;
+  document.getElementById('m-safe').textContent=safe.length;
+
+  document.getElementById('severity-block').innerHTML=`
+    <div class="alert-block ${sev.cls}">
+      <div class="ab-icon">${sev.cls==='high'?'🚨':sev.cls==='medium'?'⚠️':'✅'}</div>
+      <div class="ab-content">
+        <div class="ab-title">Disruption Severity: ${sev.label}</div>
+        <div class="ab-body">📍 <strong>${currentDisruption}</strong> disruption affects <strong>${affected.length}</strong> shipment(s). ${affected.length===0?'All India routes currently clear.':''}</div>
+      </div>
+    </div>`;
+
+  renderCargoPriority(enriched, matches);
+
+  const aT=document.getElementById('action-tbody');
+  aT.innerHTML=enriched.length===0
+    ?`<tr><td colspan="6" class="empty"><span class="emoji">✅</span>No affected shipments.</td></tr>`
+    :enriched.map(s=>{
+      const best=s.alternatives[0]||{text:'Manual review',tag:'general'};
+      const fl=(matches[s.id]||[]).slice(0,2).map(a=>`${aIcon(a.type)} ${a.id}`).join(', ')||'<span style="color:var(--text3)">—</span>';
+      return`<tr><td><strong style="color:var(--navy2)">${s.id}</strong></td><td>${s.cargo}</td><td>${ctBadge(s.cargo_type)}</td>
+        <td><div style="font-size:0.8rem">${best.text}</div>${s.alternatives.length>1?`<div style="font-size:0.7rem;color:var(--text3);margin-top:2px">+${s.alternatives.length-1} more</div>`:''}</td>
+        <td style="font-size:0.8rem;color:var(--indigo)">${fl}</td><td>${sBadge(s.status)}</td></tr>`;
+    }).join('');
+
+  const cT=document.getElementById('cold-tbody');
+  cT.innerHTML=alerts.length===0
+    ?`<tr><td colspan="5" class="empty"><span class="emoji">✅</span>All cold-chain readings normal.</td></tr>`
+    :alerts.map(r=>{
+      const dir=r.dir==='TOO HIGH'?`▲ above ${r.temp_max}°C`:`▼ below ${r.temp_min}°C`;
+      return`<tr><td><strong style="color:var(--navy2)">${r.shipment_id}</strong></td><td>${r.cargo}</td><td>${tBadge(r.status)}</td>
+        <td><strong>${r.temperature}°C</strong> <span style="color:var(--text3);font-size:0.76rem">${dir}</span></td>
+        <td style="color:var(--text3);font-size:0.8rem">${r.temp_min}°C – ${r.temp_max}°C</td></tr>`;
+    }).join('');
+
+  const prio=enriched.filter(s=>['perishable','hazardous'].includes(s.cargo_type));
+  const oth=enriched.filter(s=>!['perishable','hazardous'].includes(s.cargo_type));
+  const ordered=[...prio,...oth].slice(0,3);
+  const naB=document.getElementById('next-actions-body');
+  if(ordered.length===0&&alerts.length===0){ naB.innerHTML=`<div class="empty"><span class="emoji">✅</span>No actions required — all systems normal.</div>`; return; }
+  const rows=ordered.map((s,i)=>{
+    const urg=['perishable','hazardous'].includes(s.cargo_type);
+    const alt=s.alternatives[0]?.text||'Manual review required';
+    const fl=(matches[s.id]||[])[0];
+    const fn=fl?` Deploy <strong>${fl.id}</strong> (${fl.type}, ${fl.location}).`:'';
+    return`<div class="next-action-item"><div class="action-num ${urg?'urgent':''}">${i+1}</div>
+      <div class="action-detail"><div class="action-head">${s.id} — ${s.cargo} <span style="font-weight:400;color:var(--text2)">(${s.cargo_type})</span></div>
+      <div class="action-sub">Reroute via: ${alt}.${fn}</div></div></div>`;
+  });
+  if(alerts.length>0) rows.push(`<div class="next-action-item"><div class="action-num urgent">!</div>
+    <div class="action-detail"><div class="action-head">Cold-Chain: ${alerts.length} sensor alert(s)</div>
+    <div class="action-sub">Check ❄️ Cold-Chain Monitor → ${alerts.map(a=>a.shipment_id).join(', ')}</div></div></div>`);
+  naB.innerHTML=rows.join('');
+}
+
+// ── CARGO PRIORITY ──────────────────────────────────────────
+const CARGO_META = {
+  "Vaccines":          { urgency:"critical", icon:"💉", label:"CRITICAL", reason:"Biological — temperature failure = total loss" },
+  "Blood Samples":     { urgency:"critical", icon:"🩸", label:"CRITICAL", reason:"Medical samples — strict cold chain required" },
+  "Frozen Seafood":    { urgency:"critical", icon:"🐟", label:"CRITICAL", reason:"Perishable — spoils within hours at wrong temp" },
+  "Fresh Produce":     { urgency:"critical", icon:"🍎", label:"CRITICAL", reason:"Fruits & vegetables — time-critical reroute" },
+  "Spices":            { urgency:"high",     icon:"🌶️", label:"HIGH",     reason:"Perishable Indian spices — moisture sensitive" },
+  "Medical Supplies":  { urgency:"high",     icon:"🏥", label:"HIGH",     reason:"Healthcare — delivery delay impacts patients" },
+  "Chemicals":         { urgency:"high",     icon:"⚗️",  label:"HIGH",     reason:"Hazmat — requires certified routing & vessel" },
+  "Industrial Chemicals":{ urgency:"high",   icon:"🧪",  label:"HIGH",     reason:"Hazmat — certified hazmat vessel mandatory" },
+  "Machinery":         { urgency:"medium",   icon:"⚙️",  label:"MEDIUM",   reason:"Heavy equipment — port slots need rebooking" },
+  "Auto Parts":        { urgency:"medium",   icon:"🚗",  label:"MEDIUM",   reason:"Heavy cargo — assembly line impact if delayed" },
+  "Steel":             { urgency:"medium",   icon:"🔩",  label:"MEDIUM",   reason:"Bulk heavy — can wait but port demurrage risk" },
+  "Electronics":       { urgency:"medium",   icon:"💻",  label:"MEDIUM",   reason:"High value — insurance liability if delayed" },
+  "Textiles":          { urgency:"low",      icon:"🧵",  label:"LOW",      reason:"General cargo — flexible rerouting window" },
+};
+const URGENCY_ORDER = { critical:0, high:1, medium:2, low:3 };
+function getCargoMeta(cargo){ return CARGO_META[cargo] || { urgency:"low", icon:"📦", label:"LOW", reason:"General cargo" }; }
+
+function renderCargoPriority(enriched, matches){
+  const grid = document.getElementById('cargo-priority-grid');
+  if(!grid) return;
+  if(enriched.length===0){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1;padding:20px"><span class="emoji">✅</span>No affected shipments to prioritise.</div>`;
+    return;
+  }
+  const sorted = [...enriched].sort((a,b)=>URGENCY_ORDER[getCargoMeta(a.cargo).urgency]-URGENCY_ORDER[getCargoMeta(b.cargo).urgency]);
+  grid.innerHTML = sorted.map((s,i)=>{
+    const meta = getCargoMeta(s.cargo);
+    const fleet = (matches[s.id]||[])[0];
+    const altRoute = s.alternatives[0]?.text || 'Manual review required';
+    const fleetHtml = fleet
+      ? `<div class="cp-fleet-asset"><span class="cp-fleet-asset-icon">${aIcon(fleet.type)}</span><strong>${fleet.id}</strong> — ${fleet.type} @ ${fleet.location}</div>`
+      : `<div class="cp-fleet-none">No matching idle asset — charter required</div>`;
+    return `<div class="cp-card urgency-${meta.urgency}">
+      <div style="position:absolute;top:10px;right:12px;font-size:0.62rem;font-weight:800;color:var(--text3)">#${i+1}</div>
+      <div class="cp-top">
+        <div class="cp-cargo-icon">${meta.icon}</div>
+        <div class="cp-meta">
+          <div class="cp-shipid">${s.id}</div>
+          <div class="cp-cargo">${s.cargo}</div>
+          <div class="cp-type-row">${ctBadge(s.cargo_type)}<span class="cp-urgency-badge">${meta.label}</span></div>
+        </div>
+      </div>
+      <div class="cp-route">${s.origin} <span class="cp-route-arrow">→</span> ${s.destination}</div>
+      <div style="font-size:0.74rem;color:var(--text3);margin-bottom:8px">⚠ ${meta.reason}</div>
+      <div class="cp-fleet-row">
+        <div class="cp-fleet-label">Best available fleet</div>
+        ${fleetHtml}
+      </div>
+      <div class="cp-alt"><span>🔀</span><span>${altRoute}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── LEAFLET MAP ────────────────────────────────────────────────
+let leafletMap = null;
+
+// Separate layer groups for toggling
+const MAP_LAYER_GROUPS = {};
+const MAP_LAYER_STATES = { shipping:true, truck:true, disruption:true, ports:true, alt:true };
+
+// India truck depot → port road routes (lat/lon waypoints)
+const TRUCK_ROUTES = [
+  { id:'TRK-001', from:'Mumbai Depot (JNPT)', to:'JNPT Mumbai Port',
+    waypoints:[[19.22,72.85],[19.1,72.88],[18.95,72.95]], color:'#f59e0b' },
+  { id:'TRK-003', from:'Chennai Logistics Park', to:'Chennai Port',
+    waypoints:[[13.08,80.27],[13.09,80.28],[13.1,80.3]], color:'#f59e0b' },
+  { id:'TRK-005', from:'Pune Distribution Centre', to:'JNPT Mumbai Port',
+    waypoints:[[18.52,73.86],[18.7,73.5],[18.8,73.1],[18.95,72.95]], color:'#f59e0b' },
+  { id:'TRK-006', from:'Ahmedabad ICD', to:'Mundra Port',
+    waypoints:[[23.03,72.58],[22.6,72.2],[22.84,69.7]], color:'#f59e0b' },
+  { id:'TRK-004', from:'Kolkata Freight Hub', to:'Kolkata Port',
+    waypoints:[[22.57,88.36],[22.55,88.34],[22.5,88.3]], color:'#f59e0b' },
+  { id:'TRK-002', from:'Delhi NCR Warehouse', to:'JNPT Mumbai Port',
+    waypoints:[[28.67,77.43],[26.0,76.0],[23.5,73.2],[18.95,72.95]], color:'#f59e0b' },
+];
+
+// India port definitions
+const INDIA_PORTS = [
+  {name:"JNPT Mumbai",  lat:18.95, lon:72.95, vessels:['VSL-001'], note:"Main container port — 8000t idle"},
+  {name:"Chennai Port", lat:13.1,  lon:80.3,  vessels:['VSL-002'], note:"South India gateway"},
+  {name:"Cochin Port",  lat:9.97,  lon:76.27, vessels:['VSL-003'], note:"Spice & perishable hub"},
+  {name:"Mundra Port",  lat:22.84, lon:69.7,  vessels:['VSL-005'], note:"Largest private port"},
+  {name:"Kolkata Port", lat:22.5,  lon:88.3,  vessels:['VSL-004'], note:"East India gateway"},
+];
+
+// Truck depot locations
+const TRUCK_DEPOTS = [
+  {id:'TRK-001', name:'Mumbai Depot (JNPT)',       lat:19.22, lon:72.85, status:'Idle'},
+  {id:'TRK-002', name:'Delhi NCR Warehouse',        lat:28.67, lon:77.43, status:'In Use'},
+  {id:'TRK-003', name:'Chennai Logistics Park',     lat:13.08, lon:80.27, status:'Idle'},
+  {id:'TRK-004', name:'Kolkata Freight Hub',        lat:22.57, lon:88.36, status:'In Use'},
+  {id:'TRK-005', name:'Pune Distribution Centre',   lat:18.52, lon:73.86, status:'Idle'},
+  {id:'TRK-006', name:'Ahmedabad ICD',              lat:23.03, lon:72.58, status:'Idle'},
+];
+
+function makeIcon(html, anchor){ return L.divIcon({className:'', html, iconAnchor:anchor||[0,0]}); }
+
+function buildPortIcon(){ return makeIcon(`<div style="background:#f59e0b;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #f59e0b,0 3px 10px rgba(245,158,11,0.6);cursor:pointer"></div>`,[8,8]); }
+function buildDepotIcon(idle){ const c=idle?'#8b5cf6':'#94a3b8'; return makeIcon(`<div style="width:14px;height:14px;border-radius:3px;border:3px solid #fff;box-shadow:0 0 0 2px ${c},0 2px 6px rgba(0,0,0,0.2);background:${c};transform:rotate(45deg)"></div>`,[7,7]); }
+function buildShipIcon(){ return makeIcon(`<div style="font-size:22px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.35));margin:-11px -11px">🚢</div>`,[11,11]); }
+function buildTruckIcon(idle){ return makeIcon(`<div style="font-size:18px;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.3));margin:-9px -9px;${idle?'':'opacity:0.55'}">${idle?'🚚':'🚛'}</div>`,[9,9]); }
+function buildDisruptIcon(label){ return makeIcon(`<div style="background:rgba(244,63,94,0.92);color:#fff;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,0.3);box-shadow:0 2px 8px rgba(244,63,94,0.4)">⊗ ${label}</div>`,[40,12]); }
+function buildAltIcon(label){ return makeIcon(`<div style="background:rgba(16,185,129,0.92);color:#fff;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,0.3);box-shadow:0 2px 8px rgba(16,185,129,0.4)">🔀 ${label}</div>`,[40,12]); }
+
+function initLeafletMap(){
+  if(leafletMap) return;
+  const mapEl = document.getElementById('leaflet-map');
+  if(!mapEl) return;
+
+  leafletMap = L.map('leaflet-map', {
+    zoomControl: true,
+    scrollWheelZoom: true,
+    attributionControl: true
+  }).setView([20, 78], 4);
+
+  // Esri World Street Map — professional basemap, no API key, works in any embed/browser
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution:
+        'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; ' +
+        'Source: Esri, HERE, Garmin, USGS, NGA, EPA, NPS',
+      maxZoom: 19,
+      minZoom: 2
+    }
+  ).addTo(leafletMap);
+
+  // Init layer groups
+  ['shipping','truck','disruption','ports','alt'].forEach(k=>{
+    MAP_LAYER_GROUPS[k] = L.layerGroup().addTo(leafletMap);
+  });
+
+  // Populate shipment dropdown — sea shipments
+  const sgp = document.getElementById('optgroup-shipments');
+  if(sgp && sgp.children.length === 0){
+    SHIPMENTS.forEach(s=>{
+      const o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = `${s.id} — ${s.cargo} (${s.origin} → ${s.destination})`;
+      sgp.appendChild(o);
+    });
+  }
+  // Populate shipment dropdown — truck routes
+  const tgp = document.getElementById('optgroup-trucks');
+  if(tgp && tgp.children.length === 0){
+    TRUCK_ROUTES.forEach(tr=>{
+      const asset = FLEET_ASSETS.find(a=>a.id===tr.id);
+      const o = document.createElement('option');
+      o.value = 'TRUCK_' + tr.id;
+      o.textContent = `${tr.id} — ${tr.from} → ${tr.to} (${asset?.status||'—'})`;
+      tgp.appendChild(o);
+    });
+  }
+}
+
+function clearLayerGroup(key){
+  if(MAP_LAYER_GROUPS[key]) MAP_LAYER_GROUPS[key].clearLayers();
+}
+
+function addToGroup(key, layer){
+  if(MAP_LAYER_GROUPS[key]) MAP_LAYER_GROUPS[key].addLayer(layer);
+}
+
+function toggleLayer(key, btn){
+  MAP_LAYER_STATES[key] = !MAP_LAYER_STATES[key];
+  btn.classList.toggle('on', MAP_LAYER_STATES[key]);
+  if(MAP_LAYER_GROUPS[key] && leafletMap){
+    if(MAP_LAYER_STATES[key]) leafletMap.addLayer(MAP_LAYER_GROUPS[key]);
+    else leafletMap.removeLayer(MAP_LAYER_GROUPS[key]);
+  }
+}
+
+// handleLayerToggle: ensures map is initialised before toggling
+// (buttons can be clicked before the map tab has ever been opened)
+function handleLayerToggle(key, btn){
+  if(!leafletMap){
+    // Map not initialised yet — init + render first, then apply toggle state
+    initLeafletMap();
+    renderMapPage();
+    // Defer the visual state flip until render is done
+    setTimeout(()=> toggleLayer(key, btn), 200);
+  } else {
+    toggleLayer(key, btn);
+  }
+}
+
+// Generate smooth geodesic-like arc points between two latlons
+function arcPoints(o, d, curveHeight, steps){
+  steps = steps || 50;
+  const pts = [];
+  const midLat = (o[0]+d[0])/2 + curveHeight;
+  const midLon = (o[1]+d[1])/2;
+  for(let i=0; i<=steps; i++){
+    const t = i/steps;
+    // Quadratic bezier
+    const lat = (1-t)*(1-t)*o[0] + 2*(1-t)*t*midLat + t*t*d[0];
+    const lon = (1-t)*(1-t)*o[1] + 2*(1-t)*t*midLon + t*t*d[1];
+    pts.push([lat, lon]);
+  }
+  return pts;
+}
+
+function renderMapPage(){
+  initLeafletMap();
+  if(!leafletMap) return;
+
+  const loc        = document.getElementById('map-select')?.value || 'Suez Canal';
+  const selectedId = document.getElementById('map-shipment-select')?.value || '';
+  syncSelects(loc);
+
+  // Detect whether a truck route is selected from the dropdown
+  const isTruckSelected = selectedId.startsWith('TRUCK_');
+  const selectedTruckId = isTruckSelected ? selectedId.replace('TRUCK_', '') : '';
+
+  // Clear all layer groups
+  ['shipping','truck','disruption','ports','alt'].forEach(clearLayerGroup);
+
+  const {affected, safe} = detectAffected(loc);
+  const enriched = recommendRoutes(affected, loc);
+  const dz = DISRUPTION_ZONES_LATLON[loc];
+  const altWps = ALT_WAYPOINTS_LATLON[loc] || [];
+  const altName = ALT_WAYPOINT_NAMES[loc] || 'Alternative Waypoint';
+
+  // ── DISRUPTION ZONE ──
+  if(dz){
+    addToGroup('disruption', L.circle([dz[0],dz[1]], {
+      radius: dz[2]*1000,
+      color:'#f43f5e', weight:2.5,
+      fillColor:'#f43f5e', fillOpacity:0.1,
+      dashArray:'10,7'
+    }).bindPopup(`<b style="color:#e11d48">⊗ Disruption Zone: ${dz[3]}</b><br><span style="color:#64748b">This area is currently disrupted.<br>All shipments on this route are affected.</span>`));
+    addToGroup('disruption', L.marker([dz[0],dz[1]], {icon:buildDisruptIcon(dz[3]), zIndexOffset:500}));
+  }
+
+  // ── INDIA PORT MARKERS ──
+  INDIA_PORTS.forEach(p=>{
+    const vessel = FLEET_ASSETS.find(a=>a.type==='Vessel' && a.location.includes(p.name.split(' ')[0]));
+    const vStatus = vessel ? ` | ${vessel.id}: ${vessel.status}` : '';
+    addToGroup('ports',
+      L.marker([p.lat,p.lon], {icon:buildPortIcon(), zIndexOffset:400})
+        .bindPopup(`<b style="color:#d97706">⚓ ${p.name}</b><br><span style="color:#64748b">${p.note}${vStatus}</span>`)
+        .bindTooltip(`⚓ ${p.name}`, {permanent:false, direction:'top', offset:[0,-10]})
+    );
+    if(vessel){
+      addToGroup('ports',
+        L.marker([p.lat+0.15, p.lon+0.25], {icon:buildShipIcon(), zIndexOffset:300})
+          .bindTooltip(`${vessel.id} — ${vessel.status}`, {permanent:false})
+      );
+    }
+  });
+
+  // ── TRUCK DEPOT MARKERS + TRUCK ROUTES ──
+  TRUCK_DEPOTS.forEach(dep=>{
+    const asset = FLEET_ASSETS.find(a=>a.id===dep.id);
+    const idle = asset?.status==='Idle';
+    // Highlight selected depot
+    const isSelectedDepot = isTruckSelected && dep.id === selectedTruckId;
+    addToGroup('ports',
+      L.marker([dep.lat,dep.lon], {icon:buildDepotIcon(idle), zIndexOffset: isSelectedDepot ? 600 : 350})
+        .bindPopup(`<b style="color:#7c3aed">🚚 ${dep.name}</b><br><span style="color:#64748b">${dep.id} — ${asset?.status||'Unknown'}<br>Capacity: ${asset?.capacity_tons||'—'}t</span>`)
+        .bindTooltip(`🚚 ${dep.id}`, {permanent:false, direction:'top', offset:[0,-10]})
+    );
+    addToGroup('truck',
+      L.marker([dep.lat+0.12, dep.lon-0.15], {icon:buildTruckIcon(idle), zIndexOffset:250})
+        .bindTooltip(`${dep.id} @ ${dep.name}`, {permanent:false})
+    );
+  });
+
+  // Draw truck routes — highlight selected one
+  TRUCK_ROUTES.forEach(tr=>{
+    const asset = FLEET_ASSETS.find(a=>a.id===tr.id);
+    const idle = asset?.status==='Idle';
+    const isSelected = isTruckSelected && tr.id === selectedTruckId;
+    const color   = isSelected ? '#f59e0b' : (idle ? '#8b5cf6' : '#94a3b8');
+    const weight  = isSelected ? 5 : 3;
+    const opacity = isSelected ? 1 : (idle ? 0.75 : 0.4);
+    const dash    = isSelected ? '1,0' : '8,6';   // solid when selected
+    addToGroup('truck',
+      L.polyline(tr.waypoints, {
+        color, weight, dashArray:dash, opacity,
+        lineJoin:'round', lineCap:'round'
+      }).bindPopup(`<b style="color:#b45309">🚚 ${tr.id} Truck Route</b><br>${tr.from} → ${tr.to}<br><span style="color:#64748b">Status: ${asset?.status||'—'} | Cap: ${asset?.capacity_tons||'—'}t</span>`)
+    );
+  });
+
+  // ── SHIPPING ROUTES (skip if a truck route is selected) ──
+  const shipsToShow = isTruckSelected
+    ? []
+    : (selectedId
+        ? (SHIPMENTS.find(s=>s.id===selectedId) ? [SHIPMENTS.find(s=>s.id===selectedId)] : [])
+        : SHIPMENTS);
+
+  const bounds = [[6, 55], [35, 100]]; // default India-centred bounds
+
+  shipsToShow.forEach(s=>{
+    const isAff = affected.find(x=>x.id===s.id);
+    const o=[s.lat_o, s.lon_o], d=[s.lat_d, s.lon_d];
+
+    if(isAff){
+      const arcH = (d[0]-o[0])*0.18 + 4;
+      const pts = arcPoints(o, d, arcH, 60);
+      addToGroup('shipping',
+        L.polyline(pts, {color:'#f43f5e', weight:3.5, dashArray:'12,7', opacity:0.95, lineJoin:'round'})
+          .bindPopup(`<b style="color:#e11d48">⚠ ${s.id} — ${s.cargo}</b><br>${s.origin} → ${s.destination}<br><span style="color:#64748b">Route: ${s.route}</span><br><b style="color:#e11d48">⊗ DISRUPTED</b>`)
+      );
+      if(altWps.length && MAP_LAYER_STATES.alt){
+        const wp = altWps[0];
+        const pts1 = arcPoints(o, wp, (wp[0]-o[0])*0.15+2, 40);
+        const pts2 = arcPoints(wp, d, (d[0]-wp[0])*0.15+2, 40);
+        const altPts = [...pts1, ...pts2.slice(1)];
+        addToGroup('alt',
+          L.polyline(altPts, {color:'#10b981', weight:3.5, opacity:0.9, lineJoin:'round'})
+            .bindPopup(`<b style="color:#059669">🟢 Alt Route — ${s.id}</b><br>Via ${altName}<br><span style="color:#64748b">Avoids: ${loc}</span>`)
+        );
+        addToGroup('alt', L.marker(wp, {icon:buildAltIcon(altName), zIndexOffset:400}));
+        const mid = altPts[Math.floor(altPts.length/2)];
+        addToGroup('alt', L.circleMarker(mid,{radius:5,color:'#10b981',fillColor:'#10b981',fillOpacity:1,weight:2}));
+      }
+    } else {
+      const arcH = (d[0]-o[0])*0.15 + 3;
+      const pts = arcPoints(o, d, arcH, 60);
+      addToGroup('shipping',
+        L.polyline(pts, {color:'#38bdf8', weight:2.5, opacity:0.65, lineJoin:'round'})
+          .bindPopup(`<b style="color:#0284c7">✅ ${s.id} — ${s.cargo}</b><br>${s.origin} → ${s.destination}<br><span style="color:#64748b">Route: ${s.route} — Safe</span>`)
+      );
+    }
+
+    addToGroup('shipping',
+      L.circleMarker(o, {radius:8, color:'#6366f1', fillColor:'#6366f1', fillOpacity:0.85, weight:2.5})
+        .bindTooltip(`<b>${s.origin}</b>`, {permanent:false, direction:'top'})
+    );
+    addToGroup('shipping',
+      L.circleMarker(d, {radius:7, color:'#0284c7', fillColor:'#0ea5e9', fillOpacity:0.75, weight:2})
+        .bindTooltip(`<b>${s.destination}</b>`, {permanent:false, direction:'top'})
+    );
+  });
+
+  // ── FIT BOUNDS ──
+  if(isTruckSelected){
+    const tr = TRUCK_ROUTES.find(t=>t.id===selectedTruckId);
+    if(tr) try{ leafletMap.fitBounds(tr.waypoints, {padding:[80,80]}); } catch(e){}
+  } else if(selectedId){
+    const s = SHIPMENTS.find(x=>x.id===selectedId);
+    if(s) try{ leafletMap.fitBounds([[s.lat_o,s.lon_o],[s.lat_d,s.lon_d]],{padding:[80,80]}); } catch(e){}
+  } else {
+    try{ leafletMap.fitBounds(bounds, {padding:[30,30]}); } catch(e){}
+  }
+
+  setTimeout(()=>{ if(leafletMap) leafletMap.invalidateSize(); }, 150);
+
+  // ── ROUTE DETAILS PANEL ──
+  const det = document.getElementById('map-route-details');
+
+  // Truck route detail card (shown always, highlighted row when truck selected)
+  const truckSummary = `<div class="card" style="margin-bottom:20px">
+    <div class="card-head"><div class="ch-icon">🚚</div>India Truck Network — Depot → Port Routes</div>
+    <div class="card-body"><table>
+      <thead><tr><th>Truck ID</th><th>From Depot</th><th>To Port</th><th>Status</th><th>Capacity</th></tr></thead>
+      <tbody>${TRUCK_ROUTES.map(tr=>{
+        const a = FLEET_ASSETS.find(x=>x.id===tr.id);
+        const hl = isTruckSelected && tr.id===selectedTruckId
+          ? 'background:var(--amber-light);font-weight:700;' : '';
+        return `<tr style="${hl}"><td><strong style="color:var(--navy2)">${tr.id}</strong></td>
+          <td>${tr.from}</td><td>${tr.to}</td>
+          <td>${sBadge(a?.status||'—')}</td><td>${a?.capacity_tons||'—'}t</td></tr>`;
+      }).join('')}</tbody>
+    </table></div></div>`;
+
+  // If a truck route is selected, show its detail card at the top
+  if(isTruckSelected){
+    const tr   = TRUCK_ROUTES.find(t=>t.id===selectedTruckId);
+    const asset = FLEET_ASSETS.find(a=>a.id===selectedTruckId);
+    const depotInfo = TRUCK_DEPOTS.find(d=>d.id===selectedTruckId);
+    det.innerHTML = `<div class="card" style="margin-bottom:20px;border-color:var(--amber)">
+      <div class="card-head" style="background:var(--amber-light)"><div class="ch-icon">🚚</div>
+        Truck Route Detail — ${selectedTruckId}
+      </div>
+      <div class="card-body" style="padding:18px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div style="flex:1;min-width:180px">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">From Depot</div>
+            <div style="font-size:0.92rem;font-weight:700;color:var(--navy2)">${tr?.from||'—'}</div>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">To Port</div>
+            <div style="font-size:0.92rem;font-weight:700;color:var(--navy2)">${tr?.to||'—'}</div>
+          </div>
+          <div style="flex:1;min-width:120px">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Status</div>
+            <div>${sBadge(asset?.status||'—')}</div>
+          </div>
+          <div style="flex:1;min-width:120px">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Capacity</div>
+            <div style="font-size:0.92rem;font-weight:700;color:var(--navy2)">${asset?.capacity_tons||'—'} t</div>
+          </div>
+          <div style="flex:1;min-width:120px">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Suitable For</div>
+            <div>${(asset?.suitable_for||[]).map(s=>ctBadge(s)).join(' ')}</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;font-size:0.78rem;color:var(--text3)">
+          ${(tr?.waypoints||[]).length} waypoints — route highlighted in amber on the map
+        </div>
+      </div></div>` + truckSummary;
+    return;
+  }
+
+  const toShow = enriched.filter(e=>!selectedId || e.id===selectedId);
+  if(toShow.length===0){
+    det.innerHTML = truckSummary + `<div class="empty"><span class="emoji">✅</span>No affected shipments for this disruption zone.</div>`;
+    return;
+  }
+  det.innerHTML = `<div class="card"><div class="card-head"><div class="ch-icon">📋</div>Affected Shipments — Alternative Routes</div>
+    <div class="card-body" style="padding:18px">
+    ${toShow.map(s=>`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <strong style="color:var(--navy2)">${s.id}</strong>${ctBadge(s.cargo_type)}
+        <span style="color:var(--text2);font-size:0.8rem">${s.origin} → ${s.destination}</span>${sBadge(s.status)}
+      </div>
+      <ul class="alt-list">${s.alternatives.map(a=>`<li><span class="alt-tag ${a.tag==='best'?'tag-best':'tag-general'}">${a.tag==='best'?'★ Best':'Alt'}</span>${a.text}</li>`).join('')}</ul>
+    </div>`).join('')}
+    </div></div>` + truckSummary;
+}
+
+// ── DISRUPTION PAGE ───────────────────────────────────────────
+let disFilter='all';
+function renderDisruptionPage(){
+  const loc=document.getElementById('dis-select2').value;
+  syncSelects(loc);
+  const {affected,safe}=detectAffected(loc);
+  const all=[...affected.map(s=>({...s,_a:true})),...safe.map(s=>({...s,_a:false}))];
+  const rows=all.filter(s=>disFilter==='all'?true:disFilter==='affected'?s._a:!s._a);
+  document.getElementById('dis-tbody').innerHTML=rows.map(s=>`<tr>
+    <td><strong style="color:var(--navy2)">${s.id}</strong></td><td>${s.origin} → ${s.destination}</td><td>${s.route}</td>
+    <td>${s.cargo}</td><td>${ctBadge(s.cargo_type)}</td><td>${sBadge(s.status)}</td>
+    <td>${s._a?'<span class="badge badge-red">⚠️ Affected</span>':'<span class="badge badge-green">✅ Safe</span>'}</td></tr>`).join('');
+}
+function filterDis(v,b){ disFilter=v; document.querySelectorAll('#dis-filter-bar .filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderDisruptionPage(); }
+
+// ── ROUTES PAGE ───────────────────────────────────────────────
+function renderRoutesPage(){
+  const loc=document.getElementById('route-select').value;
+  syncSelects(loc);
+  const {affected}=detectAffected(loc);
+  const enriched=recommendRoutes(affected,loc);
+  const c=document.getElementById('route-cards');
+  c.innerHTML=enriched.length===0?`<div class="empty"><span class="emoji">✅</span>No shipments affected.</div>`
+    :enriched.map(s=>`<div class="card"><div class="card-head"><div class="ch-icon">📦</div>
+      ${s.id} &nbsp;— ${s.cargo} &nbsp;${ctBadge(s.cargo_type)}
+      <span style="color:var(--text2);font-size:0.78rem;margin-left:8px">${s.origin} → ${s.destination}</span></div>
+      <div class="card-body" style="padding:16px"><ul class="alt-list">
+        ${s.alternatives.map(a=>`<li><span class="alt-tag ${a.tag==='best'?'tag-best':'tag-general'}">${a.tag==='best'?'★ Best':'Alt'}</span>${a.text}</li>`).join('')}
+      </ul></div></div>`).join('');
+}
+
+// ── FLEET PAGE ────────────────────────────────────────────────
+let fleetFilter='all';
+function renderFleetPage(){
+  const rows=FLEET_ASSETS.filter(a=>fleetFilter==='all'?true:fleetFilter==='Idle'||fleetFilter==='In Use'?a.status===fleetFilter:a.type===fleetFilter);
+  document.getElementById('fleet-tbody').innerHTML=rows.map(a=>`<tr>
+    <td><strong style="color:var(--navy2)">${a.id}</strong></td><td>${aIcon(a.type)} ${a.type}</td>
+    <td>${a.location}</td><td>${a.capacity_tons.toLocaleString()} t</td>
+    <td>${a.suitable_for.map(s=>ctBadge(s)).join(' ')}</td><td>${sBadge(a.status)}</td></tr>`).join('');
+}
+function filterFleet(v,b){ fleetFilter=v; document.querySelectorAll('#fleet-filter-bar .filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderFleetPage(); }
+
+// ── COLD-CHAIN PAGE ───────────────────────────────────────────
+let coldFilter='all';
+function renderColdChainPage(){
+  const g=analyseReadings(); const P={NORMAL:0,WARNING:1,CRITICAL:2};
+  const cards=Object.entries(g).map(([sid,readings])=>{
+    const worst=readings.reduce((a,b)=>P[b.status]>P[a.status]?b:a);
+    if(coldFilter!=='all'&&worst.status!==coldFilter)return'';
+    const cargo=readings[0].cargo;
+    const rows=readings.map(r=>{
+      const pct=Math.min(100,Math.abs(r.temperature)/Math.max(Math.abs(r.temp_max),Math.abs(r.temp_min),1)*100);
+      const col=r.status==='CRITICAL'?'#f43f5e':r.status==='WARNING'?'#f59e0b':'#10b981';
+      return`<tr><td style="color:var(--text2)">${r.timestamp}</td><td><strong>${r.temperature}°C</strong></td>
+        <td>${tBadge(r.status)}</td><td>
+        <div class="temp-bar-wrap"><div class="temp-bar-bg"><div class="temp-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+        <span style="font-size:0.72rem;color:var(--text3)">${r.temp_min}–${r.temp_max}°C</span></div></td></tr>`;
+    }).join('');
+    return`<div class="card"><div class="card-head"><div class="ch-icon">❄️</div>${sid} — ${cargo} &nbsp;${tBadge(worst.status)}</div>
+      <div class="card-body"><table><thead><tr><th>Timestamp</th><th>Temperature</th><th>Status</th><th>Range</th></tr></thead>
+      <tbody>${rows}</tbody></table></div></div>`;
+  });
+  document.getElementById('cold-shipment-cards').innerHTML=cards.join('')||`<div class="empty"><span class="emoji">✅</span>No readings match.</div>`;
+}
+function filterCold(v,b){ coldFilter=v; document.querySelectorAll('#cold-filter-bar .filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderColdChainPage(); }
+
+// ── NAVIGATION ────────────────────────────────────────────────
+const PAGES=['dashboard','map','disruption','routes','fleet','coldchain','about'];
+function showPage(name){
+  PAGES.forEach(p=>{ document.getElementById(`page-${p}`).classList.toggle('active',p===name); document.getElementById(`nav-${p}`).classList.toggle('active',p===name); });
+  if(name==='dashboard') renderDashboard();
+  if(name==='map'){
+    // Use requestAnimationFrame to ensure tab content is visible before rendering map
+    requestAnimationFrame(()=>{
+      renderMapPage();
+      setTimeout(()=>{ if(leafletMap) leafletMap.invalidateSize(); }, 120);
+    });
+  }
+  if(name==='disruption')renderDisruptionPage();
+  if(name==='routes')    renderRoutesPage();
+  if(name==='fleet')     renderFleetPage();
+  if(name==='coldchain') renderColdChainPage();
+}
+
+// ── LOGIN / AUTH ──────────────────────────────────────────────
+let currentUser={name:'',role:''};
+let selectedRole='Fleet Commander';
+function quickLogin(user,pass,role){ document.getElementById('login-user').value=user; document.getElementById('login-pass').value=pass; selectedRole=role; doLogin(); }
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value.trim();
+  if(!u||!p){ alert('Please enter your username and access code.'); return; }
+  currentUser={name:u,role:selectedRole};
+  document.getElementById('login-screen').style.display='none';
+  const ws=document.getElementById('welcome-screen');
+  ws.style.display='flex';
+  spawnStars('welcome-stars');
+  document.getElementById('welcome-user-msg').textContent=`Welcome, ${u.replace('.',' ').replace(/\b\w/g,c=>c.toUpperCase())}! — ${selectedRole}`;
+}
+function enterApp(){
+  document.getElementById('welcome-screen').style.display='none';
+  const app=document.getElementById('app');
+  app.style.display='flex';
+  document.getElementById('topbar-username').textContent=currentUser.name;
+  document.getElementById('topbar-avatar').textContent=currentUser.name.charAt(0).toUpperCase();
+  renderDashboard();
+  renderFleetPage();
+  // Pre-init map in background so it's ready when user navigates to it
+  setTimeout(()=>{ initLeafletMap(); }, 500);
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-pass').value='';
+}
+
+// ── STARFIELD ─────────────────────────────────────────────────
+function spawnStars(containerId){
+  const c=document.getElementById(containerId);
+  if(!c||c.dataset.spawned) return;
+  c.dataset.spawned='1';
+  for(let i=0;i<180;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()<0.1?3:Math.random()<0.3?2:1;
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*65}%;width:${sz}px;height:${sz}px;--dur:${3+Math.random()*5}s;--del:${Math.random()*6}s;--maxop:${0.3+Math.random()*0.7};`;
+    c.appendChild(s);
+  }
+  for(let i=0;i<4;i++){
+    const ss=document.createElement('div'); ss.className='shooting-star';
+    const len=60+Math.random()*120;
+    ss.style.cssText=`left:${Math.random()*70}%;top:${Math.random()*40}%;width:${len}px;--sdur:${8+Math.random()*10}s;--sdel:${Math.random()*12}s;transform:rotate(${20+Math.random()*30}deg);`;
+    c.appendChild(ss);
+  }
+}
+spawnStars('login-stars');
+
+// ── CHATBOX ───────────────────────────────────────────────────
+let chatOpen=false;
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-panel').classList.toggle('hidden',!chatOpen);
+  document.getElementById('chat-fab').innerHTML=chatOpen?'✕':'🤖<span class="cf-notif">3</span>';
+  if(chatOpen) document.getElementById('chat-input').focus();
+}
+function sendChatChip(el){ document.getElementById('chat-input').value=el.textContent; sendChat(); }
+function addMsg(text,role){
+  const m=document.getElementById('chat-messages');
+  const d=document.createElement('div'); d.className=`chat-msg ${role}`;
+  d.innerHTML=text; m.appendChild(d); m.scrollTop=m.scrollHeight;
+}
+function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const q=inp.value.trim(); if(!q)return;
+  addMsg(q,'user'); inp.value='';
+  document.getElementById('chat-suggestions').style.display='none';
+  setTimeout(()=>addMsg(guardianAI(q.toLowerCase()),'bot'),320);
+}
+
+function guardianAI(q){
+  const {affected,safe}=detectAffected(currentDisruption);
+  const idle=findIdle();
+  const grouped=analyseReadings(); const alerts=getWorst(grouped);
+  const enriched=recommendRoutes(affected,currentDisruption);
+
+  if(q.match(/how many.*(affected|disrupted)|affected shipment/))
+    return`📦 <strong>${affected.length}</strong> shipment(s) affected by <strong>${currentDisruption}</strong>:<br>${affected.map(s=>`• ${s.id} — ${s.cargo} (${s.origin} → ${s.destination})`).join('<br>')||'None'}`;
+  if(q.match(/safe shipment|how many.*safe/))
+    return`✅ <strong>${safe.length}</strong> safe India shipments:<br>${safe.map(s=>`• ${s.id} — ${s.cargo} (${s.origin} → ${s.destination})`).join('<br>')}`;
+  if(q.match(/all shipment|list.*shipment/))
+    return`🚢 <strong>${SHIPMENTS.length}</strong> India shipments:<br>${SHIPMENTS.map(s=>`• ${s.id}: ${s.origin}→${s.destination} — ${s.status}`).join('<br>')}`;
+  if(q.match(/shp-\d+/)){
+    const sid=q.match(/shp-\d+/)[0].toUpperCase();
+    const shp=SHIPMENTS.find(s=>s.id===sid);
+    if(!shp)return`❌ Shipment <strong>${sid}</strong> not found.`;
+    const isAff=affected.find(s=>s.id===sid);
+    const alts=isAff?enriched.find(s=>s.id===sid)?.alternatives.map(a=>a.text).join('<br>'):'Route is clear — no alternatives needed';
+    return`📦 <strong>${shp.id}</strong><br>Origin: ${shp.origin}<br>Destination: ${shp.destination}<br>Route: ${shp.route}<br>Cargo: ${shp.cargo} (${shp.cargo_type})<br>Status: ${shp.status}<br>Disrupted: ${isAff?'⚠️ Yes':'✅ No'}<br>Alternatives:<br>${alts}`;
+  }
+  if(q.match(/india.*port|port.*india|jnpt|cochin|mundra|chennai.*port|kolkata.*port/))
+    return`🇮🇳 India ports active:<br>• JNPT Mumbai — VSL-001 idle (8,000t)<br>• Chennai Port — VSL-002 in use<br>• Cochin Port — VSL-003 idle (5,000t)<br>• Mundra Port — VSL-005 idle (9,000t)<br>• Kolkata/Haldia — VSL-004 in use`;
+  if(q.match(/idle.*fleet|fleet.*idle|idle asset/))
+    return`🚚 <strong>${idle.length}</strong> idle assets:<br>${idle.map(a=>`• ${aIcon(a.type)} ${a.id} @ ${a.location} (${a.capacity_tons}t)`).join('<br>')}`;
+  if(q.match(/idle.*vessel|vessel.*idle/)){
+    const iv=idle.filter(a=>a.type==='Vessel');
+    return iv.length?`🚢 Idle vessels (${iv.length}):<br>${iv.map(v=>`• ${v.id} @ ${v.location} — ${v.capacity_tons.toLocaleString()}t`).join('<br>')}`:'🚢 No idle vessels.';
+  }
+  if(q.match(/idle.*truck|truck.*idle/)){
+    const it=idle.filter(a=>a.type==='Truck');
+    return it.length?`🚚 Idle trucks (${it.length}):<br>${it.map(t=>`• ${t.id} @ ${t.location}`).join('<br>')}`:'🚚 No idle trucks.';
+  }
+  if(q.match(/fleet|all.*asset/))
+    return`🚢🚚 India Fleet: <strong>${FLEET_ASSETS.length}</strong> assets<br>Idle: ${idle.length} | In Use: ${FLEET_ASSETS.length-idle.length}<br>Vessels: ${FLEET_ASSETS.filter(a=>a.type==='Vessel').length} | Trucks: ${FLEET_ASSETS.filter(a=>a.type==='Truck').length} | Containers: ${FLEET_ASSETS.filter(a=>a.type==='Container').length}`;
+  if(q.match(/alternative.*route|route.*alternative|reroute|bypass/)){
+    const opts=ALTERNATIVE_ROUTES[currentDisruption];
+    if(!opts) return `🧭 No alternatives defined for ${currentDisruption}.`;
+    return`🧭 Alternatives for <strong>${currentDisruption}</strong>:<br>${(opts.all||[]).join('<br>')}<br>Perishable: ${opts.perishable?.[0]||'—'}<br>Hazardous: ${opts.hazardous?.[0]||'—'}`;
+  }
+  if(q.match(/suez/))     { syncSelects('Suez Canal');        renderDashboard(); return`🗺️ Disruption set to <strong>Suez Canal</strong>.`; }
+  if(q.match(/malacca/))  { syncSelects('Strait of Malacca'); renderDashboard(); return`🗺️ Set to <strong>Strait of Malacca</strong>.`; }
+  if(q.match(/pacific/))  { syncSelects('Pacific Ocean');     renderDashboard(); return`🗺️ Set to <strong>Pacific Ocean</strong>.`; }
+  if(q.match(/atlantic/)) { syncSelects('Atlantic Ocean');    renderDashboard(); return`🗺️ Set to <strong>Atlantic Ocean</strong>.`; }
+  if(q.match(/arabian/))  { syncSelects('Arabian Sea');       renderDashboard(); return`🗺️ Set to <strong>Arabian Sea</strong>.`; }
+  if(q.match(/cold.chain|temperature.*alert|cold chain/))
+    return alerts.length===0?'❄️ All cold-chain readings <strong>normal</strong>.'
+      :`❄️ <strong>${alerts.length}</strong> alert(s):<br>${alerts.map(a=>`• ${a.shipment_id} — ${a.cargo}: ${a.temperature}°C (${a.status})`).join('<br>')}`;
+  if(q.match(/summary|overview|status|dashboard/))
+    return`📊 <strong>${currentDisruption}</strong> Status:<br>⚠️ Affected: ${affected.length}<br>✅ Safe: ${safe.length}<br>🚚 Idle fleet: ${idle.length}<br>❄️ Alerts: ${alerts.length}<br>Severity: ${getSeverity(affected.length).label}`;
+  if(q.match(/help|what can|commands/))
+    return`🤖 I understand:<br>• "affected shipments" or "safe shipments"<br>• "SHP-001" (specific shipment details)<br>• "idle fleet / vessels / trucks"<br>• "India ports status"<br>• "alternative routes"<br>• "cold chain alerts"<br>• "switch to Malacca / Pacific / Atlantic"<br>• "dashboard summary"`;
+  return`🤔 Not sure about that. Try "help" to see commands, or ask about India shipments, fleet, routes, or cold chain.`;
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────
+setInterval(()=>{
+  const n=new Date();
+  const el=document.getElementById('topbar-time');
+  if(el) el.textContent=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+</script>
+</body>
+</html>
