@@ -1,67 +1,3 @@
-submission:
-  title: "R.E.A.C.T. — Resilient Engine for Adaptive Cargo & Transport"
-
-  problem_statement: >
-    Global and India-focused supply chains face frequent, high-impact disruptions —
-    port closures, geopolitical route blockages (e.g. Suez Canal), and carrier
-    shortages — that operators currently manage reactively and in silos. There is no
-    single interface that simultaneously shows which active shipments are exposed,
-    which fleet assets are available to redeploy, whether perishable or pharma cargo
-    is still within safe temperature ranges, and what alternative routes are feasible
-    for each cargo type. The result is costly delays, spoiled cargo, and decisions made
-    without full situational awareness.
-
-  solution_summary: >
-    R.E.A.C.T. is a single-page, browser-based supply-chain control tower for India
-    operations. It combines four analytical engines — disruption detection, cargo-aware
-    route optimisation, fleet utilisation, and cold-chain temperature monitoring —
-    surfaced through six dedicated screens and a live Leaflet map, with a conversational
-    "Guardian AI" assistant that operators can query in plain English. All logic runs
-    client-side (HTML/CSS/JavaScript) and is also available as a standalone Python CLI
-    (main.py) backed by four Python modules and structured data files.
-
-  key_features:
-    - name: "Disruption Monitor with shipment exposure detection"
-      description: >
-        Scans all active shipments and classifies each as Affected or Safe based on
-        whether its route corridor (e.g. Suez Canal, Strait of Malacca) matches the
-        active disruption location. The sidebar always shows the current disruption
-        zone and reason; the Disruption Monitor screen lists every exposed shipment
-        with origin, destination, cargo type, and status.
-
-    - name: "Cargo-aware Route Optimizer"
-      description: >
-        For every affected shipment, recommends alternative routes tailored to the
-        cargo type (general, perishable, hazardous, heavy). Perishable shipments
-        receive air-freight options first (e.g. air via Dubai Hub); hazardous cargo
-        receives hazmat-certified corridor alternatives. General fallbacks (Cape of
-        Good Hope, Trans-Siberian rail, Lombok Strait, Panama Canal) are always
-        appended.
-
-    - name: "Fleet Optimizer with cargo-compatibility matching"
-      description: >
-        Identifies all Idle fleet assets (trucks, containers, vessels) from Indian
-        depots and global ports, then matches each idle asset to affected shipments
-        by comparing the asset's suitable_for list against the shipment's cargo_type.
-        Produces a redeployment recommendation table so operators can act on idle
-        capacity immediately.
-
-    - name: "Cold-Chain Monitor with three-tier temperature classification"
-      description: >
-        Classifies every sensor reading for sensitive cargo (vaccines, frozen seafood,
-        fresh produce, blood samples, industrial chemicals) as NORMAL, WARNING, or
-        CRITICAL. WARNING triggers when the breach is <= 3 degrees C outside the safe
-        range; CRITICAL triggers above 3 degrees C, prompting immediate action.
-
-    - name: "Guardian AI conversational assistant"
-      description: >
-        A floating chat widget (client-side, rule-based keyword engine — no external
-        API) that operators can query in plain English. It answers questions about
-        affected/safe shipments, idle fleet counts, India port status, alternative
-        routes, cold-chain alerts, and dashboard summaries. It can also switch the
-        active disruption zone on command, re-rendering the entire dashboard.
-        IBM watsonx.ai / Bob integration is the planned next step.
-
 team:
   name: "Frontiers"
   track: "AI"
@@ -77,3 +13,58 @@ team:
       email: "ranamihir2008@gmail.com"
     - name: "Jaini Khandhar"
       email: "jaini.khandhar@gmail.com"
+
+submission:
+  title: "R.E.A.C.T. - Resilient Engine for Adaptive Cargo and Transport"
+
+  problem_statement: >
+    Global and India-focused supply chains face frequent, high-impact disruptions
+    including port closures, geopolitical route blockages (e.g. Suez Canal), and
+    carrier shortages that operators currently manage reactively and in silos. There
+    is no single interface that simultaneously shows which active shipments are
+    exposed, which fleet assets are available to redeploy, whether perishable or
+    pharma cargo is still within safe temperature ranges, and what alternative routes
+    are feasible for each cargo type. The result is costly delays, spoiled cargo, and
+    decisions made without full situational awareness.
+
+  solution_summary: >
+    R.E.A.C.T. is a single-page, browser-based supply-chain control tower for India
+    operations. It combines four analytical engines covering disruption detection,
+    cargo-aware route optimisation, fleet utilisation, and cold-chain temperature
+    monitoring, surfaced through six dedicated screens and a live Leaflet map, with a
+    conversational Guardian AI assistant that operators can query in plain English. All
+    logic runs client-side in HTML/CSS/JavaScript and is also available as a standalone
+    Python CLI backed by four Python modules and structured data files.
+
+  key_features:
+    - name: "Disruption Monitor with shipment exposure detection"
+      description: >
+        Scans all active shipments and classifies each as Affected or Safe based on
+        whether its route corridor matches the active disruption location. Covers Suez
+        Canal, Strait of Malacca, Pacific Ocean, Atlantic Ocean, and Arabian Sea.
+
+    - name: "Cargo-aware Route Optimizer"
+      description: >
+        For every affected shipment, recommends alternative routes tailored to the
+        cargo type (general, perishable, hazardous, heavy). Perishable shipments
+        receive air-freight options first; hazardous cargo receives hazmat-certified
+        corridor alternatives. Universal fallbacks are always appended.
+
+    - name: "Fleet Optimizer with cargo-compatibility matching"
+      description: >
+        Identifies all idle fleet assets (trucks, containers, vessels) from Indian
+        depots and global ports, then matches each idle asset to affected shipments
+        by comparing the asset suitable_for list against the shipment cargo_type.
+
+    - name: "Cold-Chain Monitor with three-tier temperature classification"
+      description: >
+        Classifies every sensor reading for sensitive cargo as NORMAL, WARNING, or
+        CRITICAL using a 3 degree C breach threshold. Covers vaccines, frozen seafood,
+        fresh produce, blood samples, and industrial chemicals.
+
+    - name: "Guardian AI conversational assistant"
+      description: >
+        A floating chat widget using a client-side rule-based engine that operators
+        can query in plain English about shipments, fleet, routes, and cold-chain
+        alerts. Can switch the active disruption zone on command, re-rendering the
+        entire dashboard. IBM watsonx.ai integration is the planned next step.
