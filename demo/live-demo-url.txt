@@ -1,1 +1,1 @@
-NOT DEPLOYED — run locally using docs/setup-guide.md
+https://tirth080904-cse.github.io/bob-ai-hackathon--FRONTIERS-/src/dashboard.html
