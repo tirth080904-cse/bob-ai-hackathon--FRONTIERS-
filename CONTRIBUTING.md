@@ -114,4 +114,8 @@ Once validation passes:
 - [ ] Repository is **Public**
 - [ ] Entry form submitted before the deadline
 
+<<<<<<< HEAD
 ---
+=======
+---
+>>>>>>> c3a8fc07675e73485e50b13f34188f3c772b2ef0

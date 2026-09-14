@@ -136,4 +136,8 @@ jobs:
           echo ""
           echo "Team:  $(yq '.team.name' submission.yaml)"
           echo "Title: $(yq '.submission.title' submission.yaml)"
+<<<<<<< HEAD
           echo "Track: $(yq '.team.track' submission.yaml)"
+=======
+          echo "Track: $(yq '.team.track' submission.yaml)"
+>>>>>>> c3a8fc07675e73485e50b13f34188f3c772b2ef0
