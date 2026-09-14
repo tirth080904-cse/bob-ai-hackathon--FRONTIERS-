@@ -1,4 +1,4 @@
-﻿name: âœ… Validate Submission
+name: Validate Submission
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
             https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
-      # â”€â”€ 1. Required files exist â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 1. Required files exist ----------------------------------------
       - name: Check required files exist
         run: |
           MISSING=()
@@ -36,23 +36,23 @@ jobs:
           )
           for f in "${REQUIRED_FILES[@]}"; do
             if [ ! -f "$f" ]; then
-              MISSING+=("âŒ Missing: $f")
+              MISSING+=("Missing: $f")
             fi
           done
           if [ ${#MISSING[@]} -gt 0 ]; then
-            echo "Submission validation FAILED â€” missing required files:"
+            echo "Submission validation FAILED -- missing required files:"
             printf '%s\n' "${MISSING[@]}"
             exit 1
           fi
-          echo "âœ… All required files present."
+          echo "All required files present."
 
-      # â”€â”€ 2. submission.yaml is valid YAML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 2. submission.yaml is valid YAML --------------------------------
       - name: Validate submission.yaml is parseable
         run: |
           yq '.' submission.yaml > /dev/null
-          echo "âœ… submission.yaml is valid YAML."
+          echo "submission.yaml is valid YAML."
 
-      # â”€â”€ 3. Required fields are filled in â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 3. Required fields are filled in --------------------------------
       - name: Check required fields in submission.yaml
         run: |
           ERRORS=()
@@ -63,7 +63,7 @@ jobs:
             local val
             val=$(yq "$path" submission.yaml 2>/dev/null)
             if [ -z "$val" ] || [ "$val" = "null" ] || [ "$val" = '""' ] || [ "$val" = "" ]; then
-              ERRORS+=("âŒ Required field missing or empty: $label ($path)")
+              ERRORS+=("Required field missing or empty: $label ($path)")
             fi
           }
 
@@ -78,60 +78,60 @@ jobs:
           # Check track is a valid value
           TRACK=$(yq '.team.track' submission.yaml)
           if [[ ! "$TRACK" =~ ^(AI|DevOps|Sustainability|Open)$ ]]; then
-            ERRORS+=("âŒ team.track must be one of: AI | DevOps | Sustainability | Open (got: $TRACK)")
+            ERRORS+=("team.track must be one of: AI | DevOps | Sustainability | Open (got: $TRACK)")
           fi
 
           # Check at least one key feature
           FEATURES=$(yq '.submission.key_features | length' submission.yaml)
           if [ "$FEATURES" -lt 1 ]; then
-            ERRORS+=("âŒ submission.key_features must have at least 1 entry")
+            ERRORS+=("submission.key_features must have at least 1 entry")
           fi
 
           if [ ${#ERRORS[@]} -gt 0 ]; then
-            echo "Submission validation FAILED â€” incomplete fields in submission.yaml:"
+            echo "Submission validation FAILED -- incomplete fields in submission.yaml:"
             printf '%s\n' "${ERRORS[@]}"
             exit 1
           fi
-          echo "âœ… All required submission.yaml fields are filled."
+          echo "All required submission.yaml fields are filled."
 
-      # â”€â”€ 4. src/ has actual code (not just README) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 4. src/ has actual code (not just README) -----------------------
       - name: Check src/ is not empty
         run: |
           CODE_FILES=$(find src/ -type f ! -name "README.md" ! -name ".env.example" | wc -l)
           if [ "$CODE_FILES" -lt 1 ]; then
-            echo "âŒ src/ contains no source code files. Add your project code to src/."
+            echo "src/ contains no source code files. Add your project code to src/."
             exit 1
           fi
-          echo "âœ… src/ contains $CODE_FILES source file(s)."
+          echo "src/ contains $CODE_FILES source file(s)."
 
-      # â”€â”€ 5. Demo video link is not the placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 5. Demo video link is not the placeholder -----------------------
       - name: Check demo video link is updated
         run: |
           VIDEO_LINK=$(head -1 demo/demo-video-link.txt)
           if [[ "$VIDEO_LINK" == *"your-demo-video-link-here"* ]]; then
-            echo "âŒ demo/demo-video-link.txt still contains the placeholder URL. Update it with your real video link."
+            echo "demo/demo-video-link.txt still contains the placeholder URL."
             exit 1
           fi
-          echo "âœ… Demo video link looks real: $VIDEO_LINK"
+          echo "Demo video link looks real: $VIDEO_LINK"
 
-      # â”€â”€ 6. README placeholders are replaced â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- 6. README placeholders are replaced -----------------------------
       - name: Check README placeholders are replaced
         run: |
           if grep -q "\[Your Project Title Here\]" README.md; then
-            echo "âŒ README.md still contains placeholder text. Update it with your project details."
+            echo "README.md still contains placeholder text."
             exit 1
           fi
           if grep -q "\[Your Team Name\]" README.md; then
-            echo "âŒ README.md still contains '[Your Team Name]' placeholder."
+            echo "README.md still contains '[Your Team Name]' placeholder."
             exit 1
           fi
-          echo "âœ… README.md placeholders appear to be replaced."
+          echo "README.md placeholders appear to be replaced."
 
-      # â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      # -- Summary ---------------------------------------------------------
       - name: Validation passed
         run: |
           echo ""
-          echo "ðŸŽ‰ Submission validation passed!"
+          echo "Submission validation passed!"
           echo "Your repository meets all structural requirements."
           echo ""
           echo "Team:  $(yq '.team.name' submission.yaml)"
