@@ -37,34 +37,41 @@ submission:
     Python CLI backed by four Python modules and structured data files.
 
   key_features:
-    - name: "Disruption Monitor with shipment exposure detection"
-      description: >
-        Scans all active shipments and classifies each as Affected or Safe based on
-        whether its route corridor matches the active disruption location. Covers Suez
-        Canal, Strait of Malacca, Pacific Ocean, Atlantic Ocean, and Arabian Sea.
+    - "Disruption Monitor: scans active shipments and classifies each as Affected or Safe based on route corridor match (Suez Canal, Strait of Malacca, Pacific, Atlantic, Arabian Sea)"
+    - "Cargo-aware Route Optimizer: recommends alternative routes tailored to cargo type (perishable gets air-freight first, hazardous gets certified corridors, universal fallbacks always appended)"
+    - "Fleet Optimizer: identifies idle fleet assets and matches each to affected shipments by cargo-type compatibility (suitable_for vs cargo_type)"
+    - "Cold-Chain Monitor: classifies sensor readings as NORMAL / WARNING / CRITICAL using a 3-degree-C breach threshold for vaccines, frozen seafood, fresh produce, blood samples, and industrial chemicals"
+    - "Guardian AI chat assistant: client-side keyword engine answering plain-English queries about shipments, fleet, routes, and cold-chain; switches active disruption zone on command"
 
-    - name: "Cargo-aware Route Optimizer"
-      description: >
-        For every affected shipment, recommends alternative routes tailored to the
-        cargo type (general, perishable, hazardous, heavy). Perishable shipments
-        receive air-freight options first; hazardous cargo receives hazmat-certified
-        corridor alternatives. Universal fallbacks are always appended.
+  tech_stack:
+    languages: ["Python", "JavaScript", "HTML", "CSS"]
+    frameworks: []
+    ibm_technologies: []
+    databases: []
+    other: ["Leaflet.js 1.9.4", "OpenStreetMap", "Google Fonts"]
 
-    - name: "Fleet Optimizer with cargo-compatibility matching"
-      description: >
-        Identifies all idle fleet assets (trucks, containers, vessels) from Indian
-        depots and global ports, then matches each idle asset to affected shipments
-        by comparing the asset suitable_for list against the shipment cargo_type.
+  what_we_are_most_proud_of: >
+    The end-to-end connected pipeline in a single view: a single disruption event
+    cascades instantly through all four analytical layers. Operators see which
+    shipments are exposed, which feasible alternative routes exist per cargo type,
+    which idle fleet assets at Indian depots (JNPT, Chennai, Cochin, Mundra, Kolkata)
+    can be redeployed, and whether any perishable cargo has already breached safe
+    temperature thresholds - all without switching screens. That chain of reasoning
+    (disruption to exposure to route to fleet to cold-chain) is fully wired in both
+    the browser dashboard and the Python CLI.
 
-    - name: "Cold-Chain Monitor with three-tier temperature classification"
-      description: >
-        Classifies every sensor reading for sensitive cargo as NORMAL, WARNING, or
-        CRITICAL using a 3 degree C breach threshold. Covers vaccines, frozen seafood,
-        fresh produce, blood samples, and industrial chemicals.
+  known_limitations: >
+    Guardian AI is a client-side keyword matcher with no IBM Bob or watsonx.ai
+    integration - real LLM integration is the top-priority next step. All shipment,
+    fleet, and sensor data is hardcoded (no live AIS feed or database). The login
+    screen is cosmetic with no real session management. Route data covers four global
+    sea corridors only; Indian coastal and road-freight routes are not yet modelled.
 
-    - name: "Guardian AI conversational assistant"
-      description: >
-        A floating chat widget using a client-side rule-based engine that operators
-        can query in plain English about shipments, fleet, routes, and cold-chain
-        alerts. Can switch the active disruption zone on command, re-rendering the
-        entire dashboard. IBM watsonx.ai integration is the planned next step.
+artifacts:
+  source_code: "src/"
+  setup_guide: "docs/setup-guide.md"
+  architecture_doc: "docs/architecture.md"
+  demo_video: "demo/demo-video-link.txt"
+  live_demo: "demo/live-demo-url.txt"
+  screenshots: "demo/screenshots/"
+  presentation: "presentation/"
